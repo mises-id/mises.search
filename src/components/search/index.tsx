@@ -19,7 +19,7 @@ const SearchComponent: React.FC = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyUp={(e) => {if(e.key === "Enter"){fetchData()}}}
             placeholder="Search the web..."
-            className="margin-right-10 flex-grow width-80 px-4 py-2 border border-gray-300 rounded-l-md rounded-r-md focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200"
+            className="margin-right-10 flex-grow width-70 px-4 py-2 border border-gray-300 rounded-l-md rounded-r-md focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200"
           />
           <button
             onClick={() => searchTerm !== '' && fetchData()}

@@ -7,7 +7,7 @@
  */
 import { getCategory, getData } from "@/api/web3sites";
 import Loading from "@/components/pageLoading";
-import SearchComponent from "@/components/search";
+// import SearchComponent from "@/components/search";
 import { web3sitesCacheKey } from "@/utils";
 import { useThrottleFn } from "ahooks";
 import { Image, InfiniteScroll, List, Popup, PullToRefresh, Tabs } from "antd-mobile";
@@ -233,7 +233,11 @@ const Home = () => {
         </div>
       </div>
 
-        <SearchComponent/>
+        {/* <SearchComponent/> */}
+
+      <script async src="https://cse.google.com/cse.js?cx=26f94955e327b21df"></script>
+      <div className="gcse-search"></div>
+
       </div>
 
       <div className="side" ref={sideElementRef}>

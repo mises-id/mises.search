@@ -7,7 +7,7 @@
  */
 import { getCategory, getData } from "@/api/web3sites";
 import Loading from "@/components/pageLoading";
-import SearchComponent from "@/components/search";
+import GoogleCustomSearch from '@/components/search/cse';
 import { web3sitesCacheKey } from "@/utils";
 import { useThrottleFn } from "ahooks";
 import { Image, InfiniteScroll, List, Popup, PullToRefresh, Tabs } from "antd-mobile";
@@ -34,6 +34,7 @@ interface categoryListType extends categoryParams {
   list?: Array<websiteParams>;
 }
 const Home = () => {
+  const cx = '26f94955e327b21df';
   const [category, setcategory] = useState<categoryParams[]>([]);
   const [activeKey, setactiveKey] = useState<string>()
   const [activeKeyIndex, setactiveKeyIndex] = useState<number>(0)
@@ -233,10 +234,7 @@ const Home = () => {
         </div>
       </div>
 
-        <SearchComponent/>
-
-      {/* <script async src="https://cse.google.com/cse.js?cx=26f94955e327b21df"></script>
-      <div className="gcse-search"></div> */}
+      <GoogleCustomSearch cx={cx}/>
 
       </div>
 

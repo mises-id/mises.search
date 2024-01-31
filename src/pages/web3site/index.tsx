@@ -46,6 +46,9 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [isDisabled, setIsDisabled] = useState<boolean>(false)
   const [visible, setVisible] = useState<boolean>(false)
+
+  const [misesContentDisplay, setMisesContentDisplay] = useState<boolean>(true)
+
   const topBarHeight = 97
   const pageSize = 200;
   const defalutParams = {
@@ -117,6 +120,190 @@ const Home = () => {
     }
     // eslint-disable-next-line
   }, [])
+
+  const trimTrailingSlash = (inputString:string) => {
+    return inputString.replace(/\/$/, '');
+  }
+
+  const extractDomainAndPath = (url:string) => {
+    try{
+        let parsedUrl = new URL(url);
+        return parsedUrl.hostname + trimTrailingSlash(parsedUrl.pathname);
+    } catch(error) {
+        return "";
+    }
+  }
+
+  const filterData = (data:any, elements:NodeListOf<Element>) => {
+    if(!elements || elements.length === 0){
+        return data;
+    }
+    const firstThreeElements = Array.from(elements).slice(0, 3);
+    let arrUrl:string[] = [];
+    firstThreeElements.forEach((item) => {
+        let url = item.getAttribute('href');
+        if(url && url !== ""){
+            arrUrl.push(extractDomainAndPath(url));
+        }
+    });
+    let ret:string[] = [];
+    if(arrUrl.length > 0){
+        data.forEach((item:any) => {
+            if(!arrUrl.includes(extractDomainAndPath(item.url))){
+                ret.push(item);
+            }
+        })
+    }
+    return ret;
+  }
+
+  const refreshMisesWrapper = (data:any, wrapperDiv:HTMLElement) => {
+      if(!Array.isArray(data) || data.length === 0){
+          return
+      }
+      data.forEach((item) => {
+          const grandParentDiv = document.createElement('div');
+          grandParentDiv.className = "gsc-webResult gsc-result";
+
+          const parentDiv = document.createElement('div');
+          parentDiv.className = "gs-webResult gs-result";
+
+          const titleDiv = document.createElement('div');
+          titleDiv.className = "gsc-thumbnail-inside";
+          titleDiv.innerHTML = `<div class="gs-title"><a class="gs-title" href="${item.url}" target="_blank">${item.title}</a></div>`;
+          parentDiv.appendChild(titleDiv);
+
+          const descDiv = document.createElement('div');
+          descDiv.className = "gsc-table-result";
+          descDiv.innerHTML = `<div class="gsc-table-cell-thumbnail gsc-thumbnail"><div class="gs-image-box gs-web-image-box gs-web-image-box-portrait"><a class="gs-image" href="${item.url}" target="_blank"><img class="gs-image" src="${item.logo}" alt="Thumbnail image"></a></div></div><div class="gsc-table-cell-snippet-close"><div class="gs-title gsc-table-cell-thumbnail gsc-thumbnail-left"><a class="gs-title" href="${item.url}" target="_blank">${item.title}</a></div><div><span></span></div><div class="gs-bidi-start-align gs-snippet">${item.desc}</div><div class="gsc-url-bottom"></div><div class="gs-richsnippet-box" style="display: none;"></div></div>`;
+          parentDiv.appendChild(descDiv);
+
+          grandParentDiv.appendChild(parentDiv);
+
+          wrapperDiv.appendChild(grandParentDiv);
+      });
+      wrapperDiv.style.display = "block";
+  }
+
+  // mises search
+  const misesSearch = (elements : NodeListOf<Element>) => {
+    const inputElement = document.getElementById('gsc-i-id1') as HTMLInputElement;
+    const query = inputElement.value.trim();
+    if(!query){
+      return;
+    }
+    fetch(`https://api.test.mises.site/api/v1/website/internal_search?keywords=${query}&limit=3`)
+    .then((response) => response.json())
+    .then((ret) => {
+      let gscWrapper = document.querySelector('.gsc-wrapper');
+      if(!gscWrapper){
+        return;
+      }
+      let wrapperDiv = document.getElementById('mises-wrapper');
+      if(wrapperDiv){
+          console.log(11111111111);
+          wrapperDiv.innerHTML = "";
+      }
+      if(ret && ret.data && ret.data.length > 0){
+        if (!wrapperDiv) {
+          wrapperDiv = document.createElement('div');
+          wrapperDiv.id = 'mises-wrapper';
+        }
+        refreshMisesWrapper(filterData(ret.data, elements), wrapperDiv);
+        gscWrapper.prepend(wrapperDiv);
+      }
+    })
+    .catch((error) => {
+      console.log(error)
+    });
+  }
+
+  // add event listeners
+  useEffect(() => {
+    window.onload = () => {
+      const xx = document.getElementById('gs_st50');
+      if(xx){
+        xx.addEventListener('click', function(e){
+          let wrapperDiv = document.getElementById('mises-wrapper');
+          if(wrapperDiv){
+              wrapperDiv.style.display = "none";
+          }
+          setMisesContentDisplay(true);
+        });
+      }
+
+      const inputElement = document.getElementById('gsc-i-id1') as HTMLInputElement;
+      if (inputElement) {
+          inputElement.addEventListener('keydown', (e) => {
+            if(e.key === "Enter" && inputElement.value.trim() !== ""){
+              setMisesContentDisplay(false);
+            }
+          });
+          const buttonElement = document.querySelector('button.gsc-search-button');
+          if (buttonElement) {
+              buttonElement.addEventListener('click', (e) => {
+                if(inputElement.value.trim() !== ""){
+                  setMisesContentDisplay(false);
+                }
+              });
+          }
+      }
+    };
+
+    // gsc
+    let featureToken = "";
+    const gscObserver = new MutationObserver(mutationsList => {
+      mutationsList.forEach(mutation => {
+        if (mutation.type === 'childList' && mutation.addedNodes.length) {
+          const mobile = document.querySelector('.gsc-cursor-container-previous');
+          const desktop = document.querySelector('.gsc-cursor-page.gsc-cursor-current-page');
+          if((mobile && mobile.innerHTML === "") || (desktop && desktop.innerHTML === "1")){
+            const elements = document.querySelectorAll('.gsc-expansionArea a.gs-title');
+            if (elements && elements.length > 0) {
+              if(elements.item(0).innerHTML !== featureToken){
+                console.log(featureToken);
+                featureToken = elements.item(0).innerHTML;
+                misesSearch(elements);
+              }else{
+                console.log(featureToken);
+                let wrapperDiv = document.getElementById('mises-wrapper');
+                if(wrapperDiv && wrapperDiv.style.display === "none"){
+                    wrapperDiv.style.display = "block";
+                }
+              }
+            }
+          }else if((mobile && mobile.innerHTML !== "") || (desktop && desktop.innerHTML !== "1")){
+            let wrapperDiv = document.getElementById('mises-wrapper');
+            if(wrapperDiv && wrapperDiv.style.display === "block"){
+                wrapperDiv.style.display = "none";
+            }
+          }
+        }
+      });
+    });
+
+    // body
+    let gscExecuted = false;
+    const bodyObserver = new MutationObserver(mutationsList => {
+      mutationsList.forEach(mutation => {
+        if (mutation.type === 'childList' && mutation.addedNodes.length) {
+          const targetElement = document.querySelector('.gsc-expansionArea');
+          if (targetElement && !gscExecuted) {
+            gscObserver.observe(targetElement, { childList: true, subtree: true });
+            bodyObserver.disconnect();
+            gscExecuted = true;
+          }
+        }
+      });
+    });
+    bodyObserver.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      bodyObserver.disconnect();
+      gscObserver.disconnect();
+    }
+    // eslint-disable-next-line
+  }, []);
 
   const loadMore = async (id?: string) => {
     if (isLoading) return;
@@ -227,17 +414,16 @@ const Home = () => {
           <NavBar backArrow={false}>Mises Search</NavBar>
         </div> */}
         
-      <div className='flex justify-between items-center px-10 py-10' style={{height: 40}}>
+      <div className='flex justify-between items-center px-10 pt-10' style={{height: 40}}>
         <div className="relative flex">
           <p className='swap-title'><span className='mises-title'>Mises</span> <span>Search</span></p>
           <div><span className="beta-tag">BETA</span></div>
         </div>
       </div>
-
       <GoogleCustomSearch cx={cx}/>
-
       </div>
 
+      { misesContentDisplay && 
       <div className="side" ref={sideElementRef}>
         <Tabs
           activeKey={activeKey}
@@ -258,6 +444,9 @@ const Home = () => {
           width={12} height={12} />
         </div>
       </div>
+      }
+
+      { misesContentDisplay &&
       <div className="main" id="main" ref={mainElementRef}>
 
         <PullToRefresh
@@ -292,6 +481,8 @@ const Home = () => {
           {hasMore && <InfiniteScroll loadMore={() => loadMore()} hasMore={hasMore} />}
         </PullToRefresh>
       </div>
+      }
+
       <Popup
         visible={visible}
         onMaskClick={() => {

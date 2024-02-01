@@ -1,4 +1,5 @@
 // cse.tsx
+import "./cse.less";
 import React, { useEffect } from 'react';
 
 interface Props {

@@ -201,16 +201,15 @@ const Home = () => {
       }
       let wrapperDiv = document.getElementById('mises-wrapper');
       if(wrapperDiv){
-          console.log(11111111111);
           wrapperDiv.innerHTML = "";
       }
       if(ret && ret.data && ret.data.length > 0){
         if (!wrapperDiv) {
           wrapperDiv = document.createElement('div');
           wrapperDiv.id = 'mises-wrapper';
+          gscWrapper.prepend(wrapperDiv);
         }
         refreshMisesWrapper(filterData(ret.data, elements), wrapperDiv);
-        gscWrapper.prepend(wrapperDiv);
       }
     })
     .catch((error) => {
@@ -232,22 +231,6 @@ const Home = () => {
         });
       }
 
-      const inputElement = document.getElementById('gsc-i-id1') as HTMLInputElement;
-      if (inputElement) {
-          inputElement.addEventListener('keydown', (e) => {
-            if(e.key === "Enter" && inputElement.value.trim() !== ""){
-              setMisesContentDisplay(false);
-            }
-          });
-          const buttonElement = document.querySelector('button.gsc-search-button');
-          if (buttonElement) {
-              buttonElement.addEventListener('click', (e) => {
-                if(inputElement.value.trim() !== ""){
-                  setMisesContentDisplay(false);
-                }
-              });
-          }
-      }
     };
 
     // gsc
@@ -260,12 +243,13 @@ const Home = () => {
           if((mobile && mobile.innerHTML === "") || (desktop && desktop.innerHTML === "1")){
             const elements = document.querySelectorAll('.gsc-expansionArea a.gs-title');
             if (elements && elements.length > 0) {
+              if(misesContentDisplay){
+                setMisesContentDisplay(false);
+              }
               if(elements.item(0).innerHTML !== featureToken){
-                console.log(featureToken);
                 featureToken = elements.item(0).innerHTML;
                 misesSearch(elements);
               }else{
-                console.log(featureToken);
                 let wrapperDiv = document.getElementById('mises-wrapper');
                 if(wrapperDiv && wrapperDiv.style.display === "none"){
                     wrapperDiv.style.display = "block";

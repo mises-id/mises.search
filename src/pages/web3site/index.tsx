@@ -138,7 +138,7 @@ const Home = () => {
     if(!elements || elements.length === 0){
         return data;
     }
-    const firstThreeElements = Array.from(elements).slice(0, 3);
+    const firstThreeElements = Array.from(elements).slice(0, 4);
     let arrUrl:string[] = [];
     firstThreeElements.forEach((item) => {
         let url = item.getAttribute('href');
@@ -182,7 +182,26 @@ const Home = () => {
 
           wrapperDiv.appendChild(grandParentDiv);
       });
-      wrapperDiv.style.display = "block";
+      wrapperDiv.style.display = "grid";
+  }
+
+  const fillMisesWrapper = (data:any, wrapperDiv:HTMLElement) => {
+    if(!Array.isArray(data) || data.length === 0){
+        return
+    }
+    data.forEach((item) => {
+        const a = document.createElement('a');
+        a.className = "list-item";
+        a.href = item.url;
+        a.target = "_blank";
+        a.rel = "noreferrer";
+        a.innerHTML = `
+        <div class="list-item-logo"><div class="adm-image" style="--width: 40px; width: 40px; --height: 40px; height: 40px; border-radius: 50px;"><img class="adm-image-img" src="${item.logo}" alt="${item.title}" draggable="false" style="object-fit: contain; display: block;"></div></div>
+        <div class="list-item-content"><span>${item.title}</span><p class="desc">${item.desc}</p></div>
+        `;
+        wrapperDiv.appendChild(a);
+    });
+    wrapperDiv.style.display = "grid";
   }
 
   // mises search
@@ -192,7 +211,7 @@ const Home = () => {
     if(!query){
       return;
     }
-    fetch(`https://api.test.mises.site/api/v1/website/internal_search?keywords=${query}&limit=3`)
+    fetch(`https://api.test.mises.site/api/v1/website/internal_search?keywords=${query}&limit=4`)
     .then((response) => response.json())
     .then((ret) => {
       let gscWrapper = document.querySelector('.gsc-wrapper');
@@ -207,9 +226,10 @@ const Home = () => {
         if (!wrapperDiv) {
           wrapperDiv = document.createElement('div');
           wrapperDiv.id = 'mises-wrapper';
+          wrapperDiv.className = 'website-container';
           gscWrapper.prepend(wrapperDiv);
         }
-        refreshMisesWrapper(filterData(ret.data, elements), wrapperDiv);
+        fillMisesWrapper(filterData(ret.data, elements), wrapperDiv);
       }
     })
     .catch((error) => {
@@ -252,13 +272,13 @@ const Home = () => {
               }else{
                 let wrapperDiv = document.getElementById('mises-wrapper');
                 if(wrapperDiv && wrapperDiv.style.display === "none"){
-                    wrapperDiv.style.display = "block";
+                    wrapperDiv.style.display = "grid";
                 }
               }
             }
           }else if((mobile && mobile.innerHTML !== "") || (desktop && desktop.innerHTML !== "1")){
             let wrapperDiv = document.getElementById('mises-wrapper');
-            if(wrapperDiv && wrapperDiv.style.display === "block"){
+            if(wrapperDiv && wrapperDiv.style.display === "grid"){
                 wrapperDiv.style.display = "none";
             }
           }

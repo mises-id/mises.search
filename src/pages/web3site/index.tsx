@@ -250,7 +250,7 @@ const Home = () => {
           if(wrapperDiv){
               wrapperDiv.style.display = "none";
           }
-          setMisesContentDisplay(true);
+          setMisesContentDisplay(false);
         });
       }
 

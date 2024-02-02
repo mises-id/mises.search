@@ -25,11 +25,18 @@ const SuspenseWrapper = (Child: ChildT, cutonFallBack?: CutonFallBackT): any => 
     </React.Suspense>
   )
 }
+
+const Wrapper = (Child: ChildT): any => {
+  return (
+    <Child />
+  )
+}
+
 const Routes = () => {
   const RouterList = useRoutes([
   {
     path: '/',
-    element: SuspenseWrapper(Web3site),
+    element: Wrapper(Web3site),
   },
   {
     path: '/extensions',

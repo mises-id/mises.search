@@ -47,7 +47,7 @@ const Home = () => {
   const [isDisabled, setIsDisabled] = useState<boolean>(false)
   const [visible, setVisible] = useState<boolean>(false)
 
-  const [misesContentDisplay, setMisesContentDisplay] = useState<boolean>(true)
+  const [misesContentDisplay, setMisesContentDisplay] = useState<boolean>(false)
 
   const topBarHeight = 97
   const pageSize = 200;

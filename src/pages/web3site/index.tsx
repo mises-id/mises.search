@@ -6,7 +6,7 @@
  * @Description: web3 site and extension site
  */
 import { getCategory, getData } from "@/api/web3sites";
-import Loading from "@/components/pageLoading";
+// import Loading from "@/components/pageLoading";
 import GoogleCustomSearch from '@/components/search/cse';
 import { web3sitesCacheKey } from "@/utils";
 import { useThrottleFn } from "ahooks";
@@ -389,7 +389,7 @@ const Home = () => {
     setTop(position)
     setVisible(!visible)
   }
-  if (!activeKey) return <Loading />
+  // if (!activeKey) return <Loading />
 
   return (
     <div className="container">

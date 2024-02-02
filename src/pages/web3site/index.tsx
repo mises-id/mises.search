@@ -204,6 +204,7 @@ const Home = () => {
         `;
         wrapperDiv.appendChild(a);
     });
+    wrapperDiv.className = "website-container";
     wrapperDiv.style.display = "grid";
   }
 
@@ -233,6 +234,11 @@ const Home = () => {
           gscWrapper.prepend(wrapperDiv);
         }
         fillMisesWrapper(filterData(ret.data, elements), wrapperDiv);
+      }else{
+        if(wrapperDiv){
+          wrapperDiv.style.display = "none";
+          wrapperDiv.className = "";
+        }
       }
     })
     .catch((error) => {
@@ -248,6 +254,7 @@ const Home = () => {
         xx.addEventListener('click', function(e){
           let wrapperDiv = document.getElementById('mises-wrapper');
           if(wrapperDiv){
+              wrapperDiv.className = "";
               wrapperDiv.style.display = "none";
           }
           setMisesContentDisplay(false);
@@ -274,7 +281,8 @@ const Home = () => {
                 misesSearch(elements);
               }else{
                 let wrapperDiv = document.getElementById('mises-wrapper');
-                if(wrapperDiv && wrapperDiv.style.display === "none"){
+                if(wrapperDiv && wrapperDiv.style.display === "none" && wrapperDiv.innerHTML !== ""){
+                    wrapperDiv.className = "website-container";
                     wrapperDiv.style.display = "grid";
                 }
               }
@@ -282,6 +290,7 @@ const Home = () => {
           }else if((mobile && mobile.innerHTML !== "") || (desktop && desktop.innerHTML !== "1")){
             let wrapperDiv = document.getElementById('mises-wrapper');
             if(wrapperDiv && wrapperDiv.style.display === "grid"){
+                wrapperDiv.className = "";
                 wrapperDiv.style.display = "none";
             }
           }

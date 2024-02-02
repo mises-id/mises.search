@@ -157,33 +157,33 @@ const Home = () => {
     return ret;
   }
 
-  const refreshMisesWrapper = (data:any, wrapperDiv:HTMLElement) => {
-      if(!Array.isArray(data) || data.length === 0){
-          return
-      }
-      data.forEach((item) => {
-          const grandParentDiv = document.createElement('div');
-          grandParentDiv.className = "gsc-webResult gsc-result";
+  // const refreshMisesWrapper = (data:any, wrapperDiv:HTMLElement) => {
+  //     if(!Array.isArray(data) || data.length === 0){
+  //         return
+  //     }
+  //     data.forEach((item) => {
+  //         const grandParentDiv = document.createElement('div');
+  //         grandParentDiv.className = "gsc-webResult gsc-result";
 
-          const parentDiv = document.createElement('div');
-          parentDiv.className = "gs-webResult gs-result";
+  //         const parentDiv = document.createElement('div');
+  //         parentDiv.className = "gs-webResult gs-result";
 
-          const titleDiv = document.createElement('div');
-          titleDiv.className = "gsc-thumbnail-inside";
-          titleDiv.innerHTML = `<div class="gs-title"><a class="gs-title" href="${item.url}" target="_blank">${item.title}</a></div>`;
-          parentDiv.appendChild(titleDiv);
+  //         const titleDiv = document.createElement('div');
+  //         titleDiv.className = "gsc-thumbnail-inside";
+  //         titleDiv.innerHTML = `<div class="gs-title"><a class="gs-title" href="${item.url}" target="_blank">${item.title}</a></div>`;
+  //         parentDiv.appendChild(titleDiv);
 
-          const descDiv = document.createElement('div');
-          descDiv.className = "gsc-table-result";
-          descDiv.innerHTML = `<div class="gsc-table-cell-thumbnail gsc-thumbnail"><div class="gs-image-box gs-web-image-box gs-web-image-box-portrait"><a class="gs-image" href="${item.url}" target="_blank"><img class="gs-image" src="${item.logo}" alt="Thumbnail image"></a></div></div><div class="gsc-table-cell-snippet-close"><div class="gs-title gsc-table-cell-thumbnail gsc-thumbnail-left"><a class="gs-title" href="${item.url}" target="_blank">${item.title}</a></div><div><span></span></div><div class="gs-bidi-start-align gs-snippet">${item.desc}</div><div class="gsc-url-bottom"></div><div class="gs-richsnippet-box" style="display: none;"></div></div>`;
-          parentDiv.appendChild(descDiv);
+  //         const descDiv = document.createElement('div');
+  //         descDiv.className = "gsc-table-result";
+  //         descDiv.innerHTML = `<div class="gsc-table-cell-thumbnail gsc-thumbnail"><div class="gs-image-box gs-web-image-box gs-web-image-box-portrait"><a class="gs-image" href="${item.url}" target="_blank"><img class="gs-image" src="${item.logo}" alt="Thumbnail image"></a></div></div><div class="gsc-table-cell-snippet-close"><div class="gs-title gsc-table-cell-thumbnail gsc-thumbnail-left"><a class="gs-title" href="${item.url}" target="_blank">${item.title}</a></div><div><span></span></div><div class="gs-bidi-start-align gs-snippet">${item.desc}</div><div class="gsc-url-bottom"></div><div class="gs-richsnippet-box" style="display: none;"></div></div>`;
+  //         parentDiv.appendChild(descDiv);
 
-          grandParentDiv.appendChild(parentDiv);
+  //         grandParentDiv.appendChild(parentDiv);
 
-          wrapperDiv.appendChild(grandParentDiv);
-      });
-      wrapperDiv.style.display = "grid";
-  }
+  //         wrapperDiv.appendChild(grandParentDiv);
+  //     });
+  //     wrapperDiv.style.display = "grid";
+  // }
 
   const fillMisesWrapper = (data:any, wrapperDiv:HTMLElement) => {
     if(!Array.isArray(data) || data.length === 0){

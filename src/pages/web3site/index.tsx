@@ -121,40 +121,43 @@ const Home = () => {
     // eslint-disable-next-line
   }, [])
 
-  const trimTrailingSlash = (inputString:string) => {
-    return inputString.replace(/\/$/, '');
-  }
+  // const trimTrailingSlash = (inputString:string) => {
+  //   return inputString.replace(/\/$/, '');
+  // }
 
-  const extractDomainAndPath = (url:string) => {
-    try{
-        let parsedUrl = new URL(url);
-        return parsedUrl.hostname + trimTrailingSlash(parsedUrl.pathname);
-    } catch(error) {
-        return "";
-    }
-  }
+  // const extractDomainAndPath = (url:string) => {
+  //   try{
+  //       let parsedUrl = new URL(url);
+  //       return parsedUrl.hostname + trimTrailingSlash(parsedUrl.pathname);
+  //   } catch(error) {
+  //       return "";
+  //   }
+  // }
 
   const filterData = (data:any, elements:NodeListOf<Element>) => {
-    if(!elements || elements.length === 0){
-        return data;
-    }
-    const firstThreeElements = Array.from(elements).slice(0, 4);
-    let arrUrl:string[] = [];
-    firstThreeElements.forEach((item) => {
-        let url = item.getAttribute('href');
-        if(url && url !== ""){
-            arrUrl.push(extractDomainAndPath(url));
-        }
-    });
-    let ret:string[] = [];
-    if(arrUrl.length > 0){
-        data.forEach((item:any) => {
-            if(!arrUrl.includes(extractDomainAndPath(item.url))){
-                ret.push(item);
-            }
-        })
-    }
-    return ret;
+
+    return data;
+
+    // if(!elements || elements.length === 0){
+    //     return data;
+    // }
+    // const firstThreeElements = Array.from(elements).slice(0, 4);
+    // let arrUrl:string[] = [];
+    // firstThreeElements.forEach((item) => {
+    //     let url = item.getAttribute('href');
+    //     if(url && url !== ""){
+    //         arrUrl.push(extractDomainAndPath(url));
+    //     }
+    // });
+    // let ret:any = [];
+    // if(arrUrl.length > 0){
+    //     data.forEach((item:any) => {
+    //         if(!arrUrl.includes(extractDomainAndPath(item.url))){
+    //             ret.push(item);
+    //         }
+    //     })
+    // }
+    // return ret;
   }
 
   // const refreshMisesWrapper = (data:any, wrapperDiv:HTMLElement) => {
@@ -211,7 +214,7 @@ const Home = () => {
     if(!query){
       return;
     }
-    fetch(`https://api.test.mises.site/api/v1/website/internal_search?keywords=${query}&limit=4`)
+    fetch(`https://api.test.mises.site/api/v1/website/internal_search?keywords=${query}`)
     .then((response) => response.json())
     .then((ret) => {
       let gscWrapper = document.querySelector('.gsc-wrapper');

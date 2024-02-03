@@ -9,14 +9,31 @@
     border-radius: 4px;
 }
 
-.website-container {
-    grid-gap: 20px 10px;
+// .website-container {
+//     grid-gap: 20px 10px;
+//     display: grid;
+//     gap: 20px 10px;
+//     grid-template-columns: 1fr 1fr;
+//     padding: 20px 0px;
+//     overflow: scroll;
+//     max-height: 160px;
+// }
+
+.website-outer-container {
     display: grid;
-    gap: 20px 10px;
-    grid-template-columns: 1fr 1fr;
-    padding: 20px 0px;
+    grid-auto-flow: column;
     overflow: scroll;
-    max-height: 160px;
+}
+
+.website-sub-container {
+  grid-gap: 20px 10px;
+  display: grid;
+  gap: 20px 10px;
+  grid-template-columns: 1fr 1fr;
+  padding: 20px 0px;
+  overflow: hidden;
+  max-height: 160px;
+  min-width: 360px;
 }
 
 .list-item {

@@ -192,7 +192,14 @@ const Home = () => {
     if(!Array.isArray(data) || data.length === 0){
         return
     }
-    data.forEach((item) => {
+    let iterator:HTMLDivElement;
+    data.forEach((item, index) => {
+        if(index % 6 === 0){
+          let subContainer = document.createElement('div');
+          subContainer.className = "website-sub-container";
+          wrapperDiv.appendChild(subContainer);
+          iterator = subContainer;
+        }
         const a = document.createElement('a');
         a.className = "list-item";
         a.href = item.url;
@@ -202,9 +209,9 @@ const Home = () => {
         <div class="list-item-logo"><div class="adm-image" style="--width: 40px; width: 40px; --height: 40px; height: 40px; border-radius: 50px;"><img class="adm-image-img" src="${item.logo}" alt="${item.title}" draggable="false" style="object-fit: contain; display: block;"></div></div>
         <div class="list-item-content"><span>${item.title}</span><p class="desc">${item.desc}</p></div>
         `;
-        wrapperDiv.appendChild(a);
+        iterator.appendChild(a);
     });
-    wrapperDiv.className = "website-container";
+    wrapperDiv.className = "website-outer-container";
     wrapperDiv.style.display = "grid";
   }
 
@@ -230,7 +237,7 @@ const Home = () => {
         if (!wrapperDiv) {
           wrapperDiv = document.createElement('div');
           wrapperDiv.id = 'mises-wrapper';
-          wrapperDiv.className = 'website-container';
+          wrapperDiv.className = 'website-outer-container';
           gscWrapper.prepend(wrapperDiv);
         }
         fillMisesWrapper(filterData(ret.data, elements), wrapperDiv);
@@ -282,7 +289,7 @@ const Home = () => {
               }else{
                 let wrapperDiv = document.getElementById('mises-wrapper');
                 if(wrapperDiv && wrapperDiv.style.display === "none" && wrapperDiv.innerHTML !== ""){
-                    wrapperDiv.className = "website-container";
+                    wrapperDiv.className = "website-outer-container";
                     wrapperDiv.style.display = "grid";
                 }
               }
@@ -476,7 +483,7 @@ const Home = () => {
             {categoryListParams.map((item) => {
               return <div key={item.id} className="category-item">
                 <h3 id={`anchor-${item.id}`} className="main-title">{item.name}</h3>
-                <div className="website-container">
+                <div className="website-outer-container">
                   {
                     item.list?.map((val, index) => {
                       return <a key={index} className="list-item" href={val.url} target="_blank" rel="noreferrer">

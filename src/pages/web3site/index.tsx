@@ -6,8 +6,8 @@
  * @Description: web3 site and extension site
  */
 import { getCategory, getData } from "@/api/web3sites";
-import Loading from "@/components/pageLoading";
-import SearchComponent from "@/components/search";
+// import Loading from "@/components/pageLoading";
+import GoogleCustomSearch from '@/components/search/cse';
 import { web3sitesCacheKey } from "@/utils";
 import { useThrottleFn } from "ahooks";
 import { Image, InfiniteScroll, List, Popup, PullToRefresh, Tabs } from "antd-mobile";
@@ -34,6 +34,7 @@ interface categoryListType extends categoryParams {
   list?: Array<websiteParams>;
 }
 const Home = () => {
+  const cx = '26f94955e327b21df';
   const [category, setcategory] = useState<categoryParams[]>([]);
   const [activeKey, setactiveKey] = useState<string>()
   const [activeKeyIndex, setactiveKeyIndex] = useState<number>(0)
@@ -45,6 +46,9 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [isDisabled, setIsDisabled] = useState<boolean>(false)
   const [visible, setVisible] = useState<boolean>(false)
+
+  const [misesContentDisplay, setMisesContentDisplay] = useState<boolean>(false)
+
   const topBarHeight = 97
   const pageSize = 200;
   const defalutParams = {
@@ -116,6 +120,213 @@ const Home = () => {
     }
     // eslint-disable-next-line
   }, [])
+
+  // const trimTrailingSlash = (inputString:string) => {
+  //   return inputString.replace(/\/$/, '');
+  // }
+
+  // const extractDomainAndPath = (url:string) => {
+  //   try{
+  //       let parsedUrl = new URL(url);
+  //       return parsedUrl.hostname + trimTrailingSlash(parsedUrl.pathname);
+  //   } catch(error) {
+  //       return "";
+  //   }
+  // }
+
+  const filterData = (data:any, elements:NodeListOf<Element>) => {
+
+    return data;
+
+    // if(!elements || elements.length === 0){
+    //     return data;
+    // }
+    // const firstThreeElements = Array.from(elements).slice(0, 4);
+    // let arrUrl:string[] = [];
+    // firstThreeElements.forEach((item) => {
+    //     let url = item.getAttribute('href');
+    //     if(url && url !== ""){
+    //         arrUrl.push(extractDomainAndPath(url));
+    //     }
+    // });
+    // let ret:any = [];
+    // if(arrUrl.length > 0){
+    //     data.forEach((item:any) => {
+    //         if(!arrUrl.includes(extractDomainAndPath(item.url))){
+    //             ret.push(item);
+    //         }
+    //     })
+    // }
+    // return ret;
+  }
+
+  // const refreshMisesWrapper = (data:any, wrapperDiv:HTMLElement) => {
+  //     if(!Array.isArray(data) || data.length === 0){
+  //         return
+  //     }
+  //     data.forEach((item) => {
+  //         const grandParentDiv = document.createElement('div');
+  //         grandParentDiv.className = "gsc-webResult gsc-result";
+
+  //         const parentDiv = document.createElement('div');
+  //         parentDiv.className = "gs-webResult gs-result";
+
+  //         const titleDiv = document.createElement('div');
+  //         titleDiv.className = "gsc-thumbnail-inside";
+  //         titleDiv.innerHTML = `<div class="gs-title"><a class="gs-title" href="${item.url}" target="_blank">${item.title}</a></div>`;
+  //         parentDiv.appendChild(titleDiv);
+
+  //         const descDiv = document.createElement('div');
+  //         descDiv.className = "gsc-table-result";
+  //         descDiv.innerHTML = `<div class="gsc-table-cell-thumbnail gsc-thumbnail"><div class="gs-image-box gs-web-image-box gs-web-image-box-portrait"><a class="gs-image" href="${item.url}" target="_blank"><img class="gs-image" src="${item.logo}" alt="Thumbnail image"></a></div></div><div class="gsc-table-cell-snippet-close"><div class="gs-title gsc-table-cell-thumbnail gsc-thumbnail-left"><a class="gs-title" href="${item.url}" target="_blank">${item.title}</a></div><div><span></span></div><div class="gs-bidi-start-align gs-snippet">${item.desc}</div><div class="gsc-url-bottom"></div><div class="gs-richsnippet-box" style="display: none;"></div></div>`;
+  //         parentDiv.appendChild(descDiv);
+
+  //         grandParentDiv.appendChild(parentDiv);
+
+  //         wrapperDiv.appendChild(grandParentDiv);
+  //     });
+  //     wrapperDiv.style.display = "grid";
+  // }
+
+  const fillMisesWrapper = (data:any, wrapperDiv:HTMLElement) => {
+    if(!Array.isArray(data) || data.length === 0){
+        return
+    }
+    let iterator:HTMLDivElement;
+    data.forEach((item, index) => {
+        if(index % 6 === 0){
+          let subContainer = document.createElement('div');
+          subContainer.className = "website-sub-container";
+          wrapperDiv.appendChild(subContainer);
+          iterator = subContainer;
+        }
+        const a = document.createElement('a');
+        a.className = "list-item";
+        a.href = item.url;
+        a.target = "_blank";
+        a.rel = "noreferrer";
+        a.innerHTML = `
+        <div class="list-item-logo"><div class="adm-image" style="--width: 40px; width: 40px; --height: 40px; height: 40px; border-radius: 50px;"><img class="adm-image-img" src="${item.logo}" alt="${item.title}" draggable="false" style="object-fit: contain; display: block;"></div></div>
+        <div class="list-item-content"><span>${item.title}</span><p class="desc">${item.desc}</p></div>
+        `;
+        iterator.appendChild(a);
+    });
+    wrapperDiv.className = "website-outer-container";
+    wrapperDiv.style.display = "grid";
+  }
+
+  // mises search
+  const misesSearch = (elements : NodeListOf<Element>) => {
+    const inputElement = document.getElementById('gsc-i-id1') as HTMLInputElement;
+    const query = inputElement.value.trim();
+    if(!query){
+      return;
+    }
+    fetch(`https://api.alb.mises.site/api/v1/website/internal_search?keywords=${query}`)
+    .then((response) => response.json())
+    .then((ret) => {
+      let gscWrapper = document.querySelector('.gsc-wrapper');
+      if(!gscWrapper){
+        return;
+      }
+      let wrapperDiv = document.getElementById('mises-wrapper');
+      if(wrapperDiv){
+          wrapperDiv.innerHTML = "";
+      }
+      if(ret && ret.data && ret.data.length > 0){
+        if (!wrapperDiv) {
+          wrapperDiv = document.createElement('div');
+          wrapperDiv.id = 'mises-wrapper';
+          wrapperDiv.className = 'website-outer-container';
+          gscWrapper.prepend(wrapperDiv);
+        }
+        fillMisesWrapper(filterData(ret.data, elements), wrapperDiv);
+      }else{
+        if(wrapperDiv){
+          wrapperDiv.style.display = "none";
+          wrapperDiv.className = "";
+        }
+      }
+    })
+    .catch((error) => {
+      console.log(error)
+    });
+  }
+
+  // add event listeners
+  useEffect(() => {
+    window.onload = () => {
+      const xx = document.getElementById('gs_st50');
+      if(xx){
+        xx.addEventListener('click', function(e){
+          let wrapperDiv = document.getElementById('mises-wrapper');
+          if(wrapperDiv){
+              wrapperDiv.className = "";
+              wrapperDiv.style.display = "none";
+          }
+          setMisesContentDisplay(false);
+        });
+      }
+
+    };
+
+    // gsc
+    let featureToken = "";
+    const gscObserver = new MutationObserver(mutationsList => {
+      mutationsList.forEach(mutation => {
+        if (mutation.type === 'childList' && mutation.addedNodes.length) {
+          const mobile = document.querySelector('.gsc-cursor-container-previous');
+          const desktop = document.querySelector('.gsc-cursor-page.gsc-cursor-current-page');
+          if((mobile && mobile.innerHTML === "") || (desktop && desktop.innerHTML === "1")){
+            const elements = document.querySelectorAll('.gsc-expansionArea a.gs-title');
+            if (elements && elements.length > 0) {
+              if(misesContentDisplay){
+                setMisesContentDisplay(false);
+              }
+              if(elements.item(0).innerHTML !== featureToken){
+                featureToken = elements.item(0).innerHTML;
+                misesSearch(elements);
+              }else{
+                let wrapperDiv = document.getElementById('mises-wrapper');
+                if(wrapperDiv && wrapperDiv.style.display === "none" && wrapperDiv.innerHTML !== ""){
+                    wrapperDiv.className = "website-outer-container";
+                    wrapperDiv.style.display = "grid";
+                }
+              }
+            }
+          }else if((mobile && mobile.innerHTML !== "") || (desktop && desktop.innerHTML !== "1")){
+            let wrapperDiv = document.getElementById('mises-wrapper');
+            if(wrapperDiv && wrapperDiv.style.display === "grid"){
+                wrapperDiv.className = "";
+                wrapperDiv.style.display = "none";
+            }
+          }
+        }
+      });
+    });
+
+    // body
+    let gscExecuted = false;
+    const bodyObserver = new MutationObserver(mutationsList => {
+      mutationsList.forEach(mutation => {
+        if (mutation.type === 'childList' && mutation.addedNodes.length) {
+          const targetElement = document.querySelector('.gsc-expansionArea');
+          if (targetElement && !gscExecuted) {
+            gscObserver.observe(targetElement, { childList: true, subtree: true });
+            bodyObserver.disconnect();
+            gscExecuted = true;
+          }
+        }
+      });
+    });
+    bodyObserver.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      bodyObserver.disconnect();
+      gscObserver.disconnect();
+    }
+    // eslint-disable-next-line
+  }, []);
 
   const loadMore = async (id?: string) => {
     if (isLoading) return;
@@ -217,7 +428,7 @@ const Home = () => {
     setTop(position)
     setVisible(!visible)
   }
-  if (!activeKey) return <Loading />
+  // if (!activeKey) return <Loading />
 
   return (
     <div className="container">
@@ -226,20 +437,16 @@ const Home = () => {
           <NavBar backArrow={false}>Mises Search</NavBar>
         </div> */}
         
-      <div className='flex justify-between items-center px-10 py-10' style={{height: 40}}>
+      <div className='flex justify-between items-center px-10 pt-10' style={{height: 40}}>
         <div className="relative flex">
           <p className='swap-title'><span className='mises-title'>Mises</span> <span>Search</span></p>
           <div><span className="beta-tag">BETA</span></div>
         </div>
       </div>
-
-        <SearchComponent/>
-
-      {/* <script async src="https://cse.google.com/cse.js?cx=26f94955e327b21df"></script>
-      <div className="gcse-search"></div> */}
-
+      <GoogleCustomSearch cx={cx}/>
       </div>
 
+      { misesContentDisplay && 
       <div className="side" ref={sideElementRef}>
         <Tabs
           activeKey={activeKey}
@@ -260,6 +467,9 @@ const Home = () => {
           width={12} height={12} />
         </div>
       </div>
+      }
+
+      { misesContentDisplay &&
       <div className="main" id="main" ref={mainElementRef}>
 
         <PullToRefresh
@@ -273,7 +483,7 @@ const Home = () => {
             {categoryListParams.map((item) => {
               return <div key={item.id} className="category-item">
                 <h3 id={`anchor-${item.id}`} className="main-title">{item.name}</h3>
-                <div className="website-container">
+                <div className="website-outer-container">
                   {
                     item.list?.map((val, index) => {
                       return <a key={index} className="list-item" href={val.url} target="_blank" rel="noreferrer">
@@ -294,6 +504,8 @@ const Home = () => {
           {hasMore && <InfiniteScroll loadMore={() => loadMore()} hasMore={hasMore} />}
         </PullToRefresh>
       </div>
+      }
+
       <Popup
         visible={visible}
         onMaskClick={() => {

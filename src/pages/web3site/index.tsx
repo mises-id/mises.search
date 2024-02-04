@@ -222,7 +222,7 @@ const Home = () => {
     if(!query){
       return;
     }
-    fetch(`https://api.test.mises.site/api/v1/website/internal_search?keywords=${query}`)
+    fetch(`https://api.alb.mises.site/api/v1/website/internal_search?keywords=${query}`)
     .then((response) => response.json())
     .then((ret) => {
       let gscWrapper = document.querySelector('.gsc-wrapper');

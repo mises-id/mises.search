@@ -188,8 +188,8 @@ const Home = () => {
   //     wrapperDiv.style.display = "grid";
   // }
 
-  const chromeURLPattern = /^https?:\/\/chrome.google.com\/webstore\/.+?\/([a-z]{32})(?=[\/#?]|$)/;
-  const chromeNewURLPattern = /^https?:\/\/chromewebstore.google.com\/detail\/.+?\/([a-z]{32})(?=[\/#?]|$)/;
+  const chromeURLPattern = /^https?:\/\/chrome.google.com\/webstore\/.+?\/([a-z]{32})(?=[/#?]|$)/;
+  const chromeNewURLPattern = /^https?:\/\/chromewebstore.google.com\/detail\/.+?\/([a-z]{32})(?=[/#?]|$)/;
   function isAppleDevice(): boolean {
     return /iPhone|iPad|iPod|Macintosh/i.test(navigator.userAgent);
   }

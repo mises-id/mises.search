@@ -188,6 +188,26 @@ const Home = () => {
   //     wrapperDiv.style.display = "grid";
   // }
 
+  const chromeURLPattern = /^https?:\/\/chrome.google.com\/webstore\/.+?\/([a-z]{32})(?=[\/#?]|$)/;
+  const chromeNewURLPattern = /^https?:\/\/chromewebstore.google.com\/detail\/.+?\/([a-z]{32})(?=[\/#?]|$)/;
+  function isAppleDevice(): boolean {
+    return /iPhone|iPad|iPod|Macintosh/i.test(navigator.userAgent);
+  }
+  const fixForExtension = (item: any) => {
+    if (item && item.url) {
+      let result = chromeURLPattern.exec(item.url);
+      if (!result) {
+          result = chromeNewURLPattern.exec(item.url);
+      }
+      if (result && result[1]) {
+        if (isAppleDevice()) {
+          item.url = `https://clients2.google.com/service/update2/crx?response=redirect&prodversion=130.0.6723.93&acceptformat=crx2,crx3&x=id%3D${result[1]}%26uc&nacl_arch=arm64`;
+        }
+        item.title = item.title + ' [Extension]'
+      }
+    }
+    return
+  }
   const fillMisesWrapper = (data:any, wrapperDiv:HTMLElement) => {
     if(!Array.isArray(data) || data.length === 0){
         return
@@ -200,6 +220,7 @@ const Home = () => {
           wrapperDiv.appendChild(subContainer);
           iterator = subContainer;
         }
+        fixForExtension(item)
         const a = document.createElement('a');
         a.className = "list-item";
         a.href = item.url;

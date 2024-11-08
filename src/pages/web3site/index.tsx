@@ -202,7 +202,7 @@ const Home = () => {
       if (result && result[1]) {
         if (isAppleDevice()) {
           item.url = `https://clients2.google.com/service/update2/crx?response=redirect&prodversion=130.0.6723.93&acceptformat=crx2,crx3&x=id%3D${result[1]}%26uc&nacl_arch=arm64`;
-          item.title = item.title + ' [Download Crx]'
+          item.title = item.title + ' [Download Extension CRX]'
         } else {
           item.title = item.title + ' [Extension]'
         }

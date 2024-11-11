@@ -11,5 +11,4 @@ import React from 'react'
 
 export const NotFund = React.lazy(() => import('./NotFound'))
 // export const Home = React.lazy(() => import('./home'))
-export const Web3site = React.lazy(() => import('./web3site'))
-export const Extensions = React.lazy(() => import('./extensions'))
+export const Search = React.lazy(() => import('./search'))

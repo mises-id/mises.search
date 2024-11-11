@@ -7,7 +7,7 @@
  */
 import React from 'react'
 import { Navigate, useRoutes } from 'react-router-dom'
-import { Web3site,Extensions } from '@/pages'
+import { Search } from '@/pages'
 import Loading from '@/components/pageLoading'
 type CutonFallBackT =
   | boolean
@@ -36,11 +36,7 @@ const Routes = () => {
   const RouterList = useRoutes([
   {
     path: '/',
-    element: Wrapper(Web3site),
-  },
-  {
-    path: '/extensions',
-    element: SuspenseWrapper(Extensions),
+    element: Wrapper(Search),
   },
   { path: '*', element: <Navigate to="/" replace /> }
   ])

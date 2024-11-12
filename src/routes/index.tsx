@@ -8,23 +8,23 @@
 import React from 'react'
 import { Navigate, useRoutes } from 'react-router-dom'
 import { Search } from '@/pages'
-import Loading from '@/components/pageLoading'
-type CutonFallBackT =
-  | boolean
-  | React.ReactChild
-  | React.ReactFragment
-  | React.ReactPortal
-  | null
+// import Loading from '@/components/pageLoading'
+// type CutonFallBackT =
+//   | boolean
+//   | React.ReactChild
+//   | React.ReactFragment
+//   | React.ReactPortal
+//   | null
 type ChildT = React.LazyExoticComponent<() => JSX.Element> | React.FC
 
 // 加载异步组件的loading
-const SuspenseWrapper = (Child: ChildT, cutonFallBack?: CutonFallBackT): any => {
-  return (
-    <React.Suspense fallback={cutonFallBack || <Loading />}>
-      <Child />
-    </React.Suspense>
-  )
-}
+// const SuspenseWrapper = (Child: ChildT, cutonFallBack?: CutonFallBackT): any => {
+//   return (
+//     <React.Suspense fallback={cutonFallBack || <Loading />}>
+//       <Child />
+//     </React.Suspense>
+//   )
+// }
 
 const Wrapper = (Child: ChildT): any => {
   return (

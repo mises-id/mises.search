@@ -47,9 +47,9 @@ const fillMisesWrapper = (data:any, wrapperDiv:HTMLElement) => {
       a.target = "_blank";
       a.rel = "noreferrer";
       a.addEventListener('click', () => {
-        logEvent(analytics, 'click_result', {
-          content_type: 'mises_result',
-          item_id: item.url
+        logEvent(analytics, 'click_mises_result', {
+          content_type: 'web3',
+          item_id: item.title
         });
       });
       a.innerHTML = `
@@ -68,7 +68,7 @@ export const misesSearch = (raw_query:string) => {
   if(!query){
     return;
   }
-  logEvent(analytics, 'search', { search_term: query });
+  logEvent(analytics, 'mises_search', { step: "start" });
   fetch(`https://api.alb.mises.site/api/v1/website/internal_search?keywords=${query}`)
   .then((response) => response.json())
   .then((ret) => {
@@ -88,14 +88,17 @@ export const misesSearch = (raw_query:string) => {
         gscWrapper.prepend(wrapperDiv);
       }
       fillMisesWrapper(filterData(ret.data, elements), wrapperDiv);
-    }else{
+      logEvent(analytics, 'mises_search', { step: "fill" });
+    } else{
       if(wrapperDiv){
         wrapperDiv.style.display = "none";
         wrapperDiv.className = "";
       }
+      logEvent(analytics, 'mises_search', { step: "nofill" });
     }
   })
   .catch((error) => {
+    logEvent(analytics, 'mises_search', { step: "error" });
     console.log(error)
   });
 }

@@ -30,7 +30,6 @@ const GoogleCustomSearch: React.FC<Props> = ({ cx }) => {
 
     const chromeNewURLPattern = /^https?:\/\/chromewebstore.google.com\/detail\/.+?\/([a-z]{32})(?=[/#?]|$)/;
     const barredResultsRenderedCallback = function(_gname: any, _query: any, _promoElts: any, resultElts: any){
-      console.log('barredResultsRenderedCallback');
       
       for (const result of resultElts) {
         var titleTag = result.querySelector('a.gs-title');
@@ -41,7 +40,6 @@ const GoogleCustomSearch: React.FC<Props> = ({ cx }) => {
         if (ogUrl) {
           const match = chromeNewURLPattern.exec(ogUrl);
           if (match && match[1]) {
-            console.log(result)
             const container = document.createElement('div');
             result.appendChild(container);
             container.classList.add('crx-download');
@@ -62,13 +60,10 @@ const GoogleCustomSearch: React.FC<Props> = ({ cx }) => {
     };
     const resultsReadyCallback = function(
       _name: any, _q: any, _promos: any, _results: any, resultsDiv: any) {
-        console.log('resultsReadyCallback');
         for (const result of _results) {
           if (result.richSnippet && result.richSnippet.metatags && result.richSnippet.metatags.ogUrl) {
             const match = chromeNewURLPattern.exec(result.richSnippet.metatags.ogUrl);
             if (match && match[1]) {
-              console.log(result)
-              console.log(resultsDiv)
               // const container = document.createElement('div');
               // resultsDiv.appendChild(container);
               // container.id = 'crx_container';
@@ -84,7 +79,6 @@ const GoogleCustomSearch: React.FC<Props> = ({ cx }) => {
     };
 
     const searchStartingCallback = (gname: any, query:string) => {
-      console.log('searchStartingCallback', gname, query);
       misesSearch(query);
       return query;
     };

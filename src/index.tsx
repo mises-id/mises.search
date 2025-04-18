@@ -7,6 +7,7 @@
  */
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { analytics } from './utils/firebase';
 import App from './App';
 import '@/styles/global.css'
 import reportWebVitals from './reportWebVitals';

@@ -1,9 +1,23 @@
 // cse.tsx
 import "./cse.less";
 import React, { useEffect } from 'react';
+import {misesSearch, maybeToggleMisesSearchResult} from './mises-search';
 
+//import {insertAdSenseAd} from './adsense';
 interface Props {
   cx: string;
+}
+
+const maybeShowDefaultAds =  () => {
+  const elements = document.querySelectorAll('.gsc-adBlock');
+  if (elements && elements.length === 0) {
+    //no gsc ads
+    let gscWrapper = document.querySelector('.gsc-wrapper');
+    if(gscWrapper){
+      //insertAdSenseAd(gscWrapper);
+      return;
+    }
+  }
 }
 
 const GoogleCustomSearch: React.FC<Props> = ({ cx }) => {
@@ -16,18 +30,16 @@ const GoogleCustomSearch: React.FC<Props> = ({ cx }) => {
 
     const chromeNewURLPattern = /^https?:\/\/chromewebstore.google.com\/detail\/.+?\/([a-z]{32})(?=[/#?]|$)/;
     const barredResultsRenderedCallback = function(_gname: any, _query: any, _promoElts: any, resultElts: any){
+      
       for (const result of resultElts) {
-        console.log(result)
         var titleTag = result.querySelector('a.gs-title');
         var ogUrl = null;
         if (titleTag) {
           ogUrl = titleTag.getAttribute('href');
-          console.log(ogUrl);
         }
         if (ogUrl) {
           const match = chromeNewURLPattern.exec(ogUrl);
           if (match && match[1]) {
-            console.log(result)
             const container = document.createElement('div');
             result.appendChild(container);
             container.classList.add('crx-download');
@@ -42,15 +54,16 @@ const GoogleCustomSearch: React.FC<Props> = ({ cx }) => {
         }
         
       }
+
+      maybeToggleMisesSearchResult();
+      maybeShowDefaultAds();
     };
-    const resultsReadyWordCloudCallback = function(
+    const resultsReadyCallback = function(
       _name: any, _q: any, _promos: any, _results: any, resultsDiv: any) {
         for (const result of _results) {
           if (result.richSnippet && result.richSnippet.metatags && result.richSnippet.metatags.ogUrl) {
             const match = chromeNewURLPattern.exec(result.richSnippet.metatags.ogUrl);
             if (match && match[1]) {
-              console.log(result)
-              console.log(resultsDiv)
               // const container = document.createElement('div');
               // resultsDiv.appendChild(container);
               // container.id = 'crx_container';
@@ -62,12 +75,20 @@ const GoogleCustomSearch: React.FC<Props> = ({ cx }) => {
           }
           
         }
+        
     };
+
+    const searchStartingCallback = (gname: any, query:string) => {
+      misesSearch(query);
+      return query;
+    };
+
     (window as any).__gcse || ((window as any).__gcse = {});
     (window as any).__gcse.searchCallbacks = {
       web: {
+        starting: searchStartingCallback,
         rendered: barredResultsRenderedCallback,
-        ready: resultsReadyWordCloudCallback
+        ready: resultsReadyCallback
       },
     };
 

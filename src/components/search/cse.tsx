@@ -3,7 +3,7 @@ import "./cse.less";
 import React, { useEffect } from 'react';
 import {misesSearch, maybeToggleMisesSearchResult} from './mises-search';
 
-import {insertAdSenseAd} from './adsense';
+//import {insertAdSenseAd} from './adsense';
 interface Props {
   cx: string;
 }
@@ -14,7 +14,7 @@ const maybeShowDefaultAds =  () => {
     //no gsc ads
     let gscWrapper = document.querySelector('.gsc-wrapper');
     if(gscWrapper){
-      insertAdSenseAd(gscWrapper);
+      //insertAdSenseAd(gscWrapper);
       return;
     }
   }

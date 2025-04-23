@@ -3,13 +3,15 @@ import "./cse.less";
 import React, { useEffect, useState } from 'react';
 import {misesSearch, maybeToggleMisesSearchResult,} from './mises-search';
 import TrendingKeywords from './trending-keywords';
+import { analytics } from '../../utils/firebase';
+import { logEvent } from 'firebase/analytics';
 
 //import {insertAdSenseAd} from './adsense';
 interface Props {
   cx: string;
 }
 
-const maybeShowDefaultAds =  () => {
+const checkGscAds =  (keyword: string) => {
   const elements = document.querySelectorAll('.gsc-adBlock');
   if (elements && elements.length === 0) {
     //no gsc ads
@@ -18,6 +20,11 @@ const maybeShowDefaultAds =  () => {
       //insertAdSenseAd(gscWrapper);
       return;
     }
+  } else if (elements && elements.length > 0) {
+    logEvent(analytics, 'gsc_ads_filled', { 
+      number: elements.length,
+      query: keyword
+    });
   }
 }
 
@@ -29,9 +36,12 @@ const GoogleCustomSearch: React.FC<Props> = ({ cx }) => {
     script.async = true;
     document.body.appendChild(script);
 
-    const barredResultsRenderedCallback = function(_gname: any, _query: any, _promoElts: any, resultElts: any){
+    const barredResultsRenderedCallback = function(_gname: any, query: any, _promoElts: any, resultElts: any){
       maybeToggleMisesSearchResult(resultElts);
-      maybeShowDefaultAds();
+      setTimeout(() => {
+        checkGscAds(query);
+      }, 1000);
+      
     };
     const resultsReadyCallback = function(
       _name: any, _q: any, _promos: any, _results: any, resultsDiv: any) {
@@ -74,10 +84,15 @@ const GoogleCustomSearch: React.FC<Props> = ({ cx }) => {
 
   const handleSearch = (keyword: string) => {
     // Navigate to search results using window.location.hash
+    logEvent(analytics, 'trending_search', {
+      query: keyword
+    });
     const searchParams = new URLSearchParams();
     searchParams.set('gsc.q', keyword);
     searchParams.set('gsc.tab', '0');
     window.location.hash = searchParams.toString();
+
+
   };
 
   // google cse container with trending keywords

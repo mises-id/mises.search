@@ -186,7 +186,7 @@ export const misesSearch = (raw_query:string) => {
     fillMisesWrapper([ve], wrapperDiv);
     logEvent(analytics, 'mises_search', { 
       step: "porn",
-      query: query
+      search_term: query
     });
     
 
@@ -194,7 +194,7 @@ export const misesSearch = (raw_query:string) => {
   }
   logEvent(analytics, 'mises_search', { 
     step: "start",
-    query: query
+    search_term: query
   });
   
 

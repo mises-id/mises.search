@@ -23,7 +23,7 @@ const checkGscAds =  (keyword: string) => {
   } else if (elements && elements.length > 0) {
     logEvent(analytics, 'gsc_ads_filled', { 
       number: elements.length,
-      query: keyword
+      search_term: keyword
     });
   }
 }
@@ -85,7 +85,7 @@ const GoogleCustomSearch: React.FC<Props> = ({ cx }) => {
   const handleSearch = (keyword: string) => {
     // Navigate to search results using window.location.hash
     logEvent(analytics, 'trending_search', {
-      query: keyword
+      search_term: keyword
     });
     const searchParams = new URLSearchParams();
     searchParams.set('gsc.q', keyword);

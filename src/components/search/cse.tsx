@@ -71,16 +71,11 @@ const GoogleCustomSearch: React.FC<Props> = ({ cx }) => {
     };
   }, [cx]);
 
-  const [showTrending, setShowTrending] = useState(true);
   const [trendingKeywords] = useState([
     'metamask extension',
     'hot wallet extension',
     'zkpass extension',
   ]);
-
-  const hideTrending = () => {
-    setShowTrending(true);
-  };
 
   const handleSearch = (keyword: string) => {
     // Navigate to search results using window.location.hash
@@ -99,16 +94,12 @@ const GoogleCustomSearch: React.FC<Props> = ({ cx }) => {
   return (
     <div className="search-container">
 
-      
-      
-      {showTrending && (
-        <TrendingKeywords 
-          keywords={trendingKeywords}
-          onKeywordClick={(keyword) => {
-            handleSearch(keyword);
-          }}
-        />
-      )}
+      <TrendingKeywords 
+        keywords={trendingKeywords}
+        onKeywordClick={(keyword) => {
+          handleSearch(keyword);
+        }}
+      />
       <div className="gcse-search" 
         data-enablehistory="true" 
         data-autocompletemaxcompletions="5"

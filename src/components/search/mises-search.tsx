@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { analytics } from '../../utils/firebase';
 import { logEvent } from 'firebase/analytics';
@@ -10,6 +10,7 @@ interface MisesSearchResult {
     logo: string;
     desc: string;
     type?: string;
+    color?: string;
 }
 
 interface InternalSearchResult {
@@ -38,19 +39,21 @@ const MisesSearchResultItem: React.FC<MisesSearchResultItemProps> = ({ item }) =
       rel="noreferrer"
       onClick={handleClick}
     >
-      <span className="list-item-logo">
+      <span className="list-item-logo"
+        style={{
+          objectFit: "contain",
+          display: "block",
+          width: '40px',
+          height: '40px',
+          borderRadius: '50px',
+        }}
+      >
         <img
           className="adm-image-img"
+          style={(item.color && {background: item.color}) || {}}
           src={item.logo}
           alt={item.title}
           draggable={false}
-          style={{
-            objectFit: "contain",
-            display: "block",
-            width: '40px',
-            height: '40px',
-            borderRadius: '50px'
-          }}
         />
       </span>
       <span className="list-item-content">
@@ -132,13 +135,70 @@ const fillMisesWrapper = (data: MisesSearchResult[], wrapperDiv: HTMLElement) =>
   );
 }
 
+const pornKeywords: string[] = [
+  "xnxx",
+  "pornhub",
+  "porn",
+  "xxx",
+  "xvideos",
+  "xhamster",
+  "xxx video",
+  "porno",
+  "xxx videos",
+  "sex videos"
+];
+
+// 判断关键词是否包含敏感词
+export function containsPornKeyword(input: string): boolean {
+  const normalized = input.toLowerCase();
+  return pornKeywords.some(keyword => normalized.includes(keyword));
+}
+
 export const misesSearch = (raw_query:string) => {
   const elements = document.querySelectorAll('.gsc-expansionArea a.gs-title');
   const query = raw_query.trim();
   if(!query){
     return;
   }
-  logEvent(analytics, 'mises_search', { step: "start" });
+
+  if (containsPornKeyword(query)) {
+    let gscWrapper = document.querySelector('.gsc-wrapper');
+    if(!gscWrapper){
+      return;
+    }
+    let wrapperDiv = document.getElementById('mises-wrapper');
+    if(wrapperDiv){
+        wrapperDiv.innerHTML = "";
+    } else {
+      wrapperDiv = document.createElement('div');
+      wrapperDiv.id = 'mises-wrapper';
+      wrapperDiv.className = 'website-outer-container';
+      gscWrapper.prepend(wrapperDiv);
+    }
+    const ve : MisesSearchResult = {
+      id: 've',
+      title: 'Video Easy',
+      url: 'https://app.videoeasy.site/index.html#/popular?ctype=porn',
+      logo: 'https://app.videoeasy.site/favicon.png',
+      desc: 'Free Porn,OnlyFans Leak, Ads free',
+      color: 'black'
+    }
+    fillMisesWrapper([ve], wrapperDiv);
+    logEvent(analytics, 'mises_search', { 
+      step: "porn",
+      query: query
+    });
+    
+
+    return
+  }
+  logEvent(analytics, 'mises_search', { 
+    step: "start",
+    query: query
+  });
+  
+
+
   fetch(`https://api.alb.mises.site/api/v1/website/internal_search?keywords=${query}`)
   .then((response) => response.json() as Promise<InternalSearchResult>)
   .then((ret) => {
@@ -168,7 +228,10 @@ export const misesSearch = (raw_query:string) => {
     }
   })
   .catch((error) => {
-    logEvent(analytics, 'mises_search', { step: "error" });
+    logEvent(analytics, 'mises_search', { 
+      step: "error",
+      error: error.message 
+    });
     console.log(error)
   });
 }

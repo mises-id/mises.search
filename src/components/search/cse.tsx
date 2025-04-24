@@ -1,6 +1,6 @@
 // cse.tsx
 import "./cse.less";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import {misesSearch, maybeToggleMisesSearchResult,} from './mises-search';
 import TrendingKeywords from './trending-keywords';
 import { analytics } from '../../utils/firebase';
@@ -71,11 +71,7 @@ const GoogleCustomSearch: React.FC<Props> = ({ cx }) => {
     };
   }, [cx]);
 
-  const [trendingKeywords] = useState([
-    'metamask extension',
-    'hot wallet extension',
-    'zkpass extension',
-  ]);
+
 
   const handleSearch = (keyword: string) => {
     // Navigate to search results using window.location.hash
@@ -94,8 +90,7 @@ const GoogleCustomSearch: React.FC<Props> = ({ cx }) => {
   return (
     <div className="search-container">
 
-      <TrendingKeywords 
-        keywords={trendingKeywords}
+      <TrendingKeywords
         onKeywordClick={(keyword) => {
           handleSearch(keyword);
         }}

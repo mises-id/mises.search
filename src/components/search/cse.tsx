@@ -1,14 +1,17 @@
 // cse.tsx
 import "./cse.less";
 import React, { useEffect } from 'react';
-import {misesSearch, maybeToggleMisesSearchResult} from './mises-search';
+import {misesSearch, maybeToggleMisesSearchResult,} from './mises-search';
+import TrendingKeywords from './trending-keywords';
+import { analytics } from '../../utils/firebase';
+import { logEvent } from 'firebase/analytics';
 
 //import {insertAdSenseAd} from './adsense';
 interface Props {
   cx: string;
 }
 
-const maybeShowDefaultAds =  () => {
+const checkGscAds =  (keyword: string) => {
   const elements = document.querySelectorAll('.gsc-adBlock');
   if (elements && elements.length === 0) {
     //no gsc ads
@@ -17,6 +20,11 @@ const maybeShowDefaultAds =  () => {
       //insertAdSenseAd(gscWrapper);
       return;
     }
+  } else if (elements && elements.length > 0) {
+    logEvent(analytics, 'gsc_ads_filled', { 
+      number: elements.length,
+      search_term: keyword
+    });
   }
 }
 
@@ -28,53 +36,16 @@ const GoogleCustomSearch: React.FC<Props> = ({ cx }) => {
     script.async = true;
     document.body.appendChild(script);
 
-    const chromeNewURLPattern = /^https?:\/\/chromewebstore.google.com\/detail\/.+?\/([a-z]{32})(?=[/#?]|$)/;
-    const barredResultsRenderedCallback = function(_gname: any, _query: any, _promoElts: any, resultElts: any){
+    const barredResultsRenderedCallback = function(_gname: any, query: any, _promoElts: any, resultElts: any){
+      maybeToggleMisesSearchResult(resultElts);
+      setTimeout(() => {
+        checkGscAds(query);
+      }, 1000);
       
-      for (const result of resultElts) {
-        var titleTag = result.querySelector('a.gs-title');
-        var ogUrl = null;
-        if (titleTag) {
-          ogUrl = titleTag.getAttribute('href');
-        }
-        if (ogUrl) {
-          const match = chromeNewURLPattern.exec(ogUrl);
-          if (match && match[1]) {
-            const container = document.createElement('div');
-            result.appendChild(container);
-            container.classList.add('crx-download');
-            var button = document.createElement('button');
-            button.textContent = 'Download Extension CRX';
-            button.onclick = function() {
-               window.open( `https://clients2.google.com/service/update2/crx?response=redirect&prodversion=130.0.6723.93&acceptformat=crx2,crx3&x=id%3D${match[1]}%26uc&nacl_arch=arm64`, '_blank');
-            }
-            container.appendChild(button);
-          }
-          
-        }
-        
-      }
-
-      maybeToggleMisesSearchResult();
-      maybeShowDefaultAds();
     };
     const resultsReadyCallback = function(
       _name: any, _q: any, _promos: any, _results: any, resultsDiv: any) {
-        for (const result of _results) {
-          if (result.richSnippet && result.richSnippet.metatags && result.richSnippet.metatags.ogUrl) {
-            const match = chromeNewURLPattern.exec(result.richSnippet.metatags.ogUrl);
-            if (match && match[1]) {
-              // const container = document.createElement('div');
-              // resultsDiv.appendChild(container);
-              // container.id = 'crx_container';
-              // var button = document.createElement('button');
-              // button.textContent = 'Click Me!';
-              // container.appendChild(button);
-            }
-            
-          }
-          
-        }
+      
         
     };
 
@@ -82,6 +53,8 @@ const GoogleCustomSearch: React.FC<Props> = ({ cx }) => {
       misesSearch(query);
       return query;
     };
+
+    
 
     (window as any).__gcse || ((window as any).__gcse = {});
     (window as any).__gcse.searchCallbacks = {
@@ -98,8 +71,39 @@ const GoogleCustomSearch: React.FC<Props> = ({ cx }) => {
     };
   }, [cx]);
 
-  // google cse container
-  return <div className="gcse-search"></div>;
+
+
+  const handleSearch = (keyword: string) => {
+    // Navigate to search results using window.location.hash
+    logEvent(analytics, 'trending_search', {
+      search_term: keyword
+    });
+    const searchParams = new URLSearchParams();
+    searchParams.set('gsc.q', keyword);
+    searchParams.set('gsc.tab', '0');
+    window.location.hash = searchParams.toString();
+
+
+  };
+
+  // google cse container with trending keywords
+  return (
+    <div className="search-container">
+
+      <TrendingKeywords
+        onKeywordClick={(keyword) => {
+          handleSearch(keyword);
+        }}
+      />
+      <div className="gcse-search" 
+        data-enablehistory="true" 
+        data-autocompletemaxcompletions="5"
+        data-autocompletemaxpromotions="5"
+        data-websearchsafesearch="off"
+        data-enableorderby="true"
+      ></div>
+    </div>
+  );
 };
 
 export default GoogleCustomSearch;

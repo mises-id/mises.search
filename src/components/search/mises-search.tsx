@@ -39,18 +39,17 @@ const MisesSearchResultItem: React.FC<MisesSearchResultItemProps> = ({ item }) =
       rel="noreferrer"
       onClick={handleClick}
     >
-      <span className="list-item-logo"
-        style={{
-          objectFit: "contain",
-          display: "block",
-          width: '40px',
-          height: '40px',
-          borderRadius: '50px',
-        }}
-      >
+      <span className="list-item-logo">
         <img
           className="adm-image-img"
-          style={(item.color && {background: item.color}) || {}}
+          style={(item.color && {
+            background: item.color,
+            objectFit: "contain",
+            borderRadius: '10px',
+          }) || {
+            objectFit: "contain",
+            borderRadius: '10px',
+          }}
           src={item.logo}
           alt={item.title}
           draggable={false}
@@ -110,7 +109,10 @@ const fixForExtension = (item: MisesSearchResult) => {
   return
 }
 
+let rootMap = new WeakMap<HTMLElement, any>();
+
 const fillMisesWrapper = (data: MisesSearchResult[], wrapperDiv: HTMLElement) => {
+  console.log('fillMisesWrapper')
   if(!Array.isArray(data) || data.length === 0) {
     return;
   }
@@ -120,7 +122,11 @@ const fillMisesWrapper = (data: MisesSearchResult[], wrapperDiv: HTMLElement) =>
     chunks.push(data.slice(i, i + 6));
   }
 
-  const root = createRoot(wrapperDiv);
+  let root = rootMap.get(wrapperDiv);
+  if (!root) {
+    root = createRoot(wrapperDiv);
+    rootMap.set(wrapperDiv, root);
+  }
   root.render(
     <div className="website-outer-container" style={{ display: 'grid' }}>
       {chunks.map((chunk: MisesSearchResult[], chunkIndex: number) => (
@@ -154,6 +160,26 @@ export function containsPornKeyword(input: string): boolean {
   return pornKeywords.some(keyword => normalized.includes(keyword));
 }
 
+function getMisesWrapper() {
+  let gscWrapper = document.querySelector('.gsc-wrapper');
+  if(!gscWrapper){
+    return;
+  }
+  let wrapperDiv = document.getElementById('mises-wrapper');
+  if(wrapperDiv){
+      const root = rootMap.get(wrapperDiv);
+      if(root) {
+          root.unmount();
+          rootMap.delete(wrapperDiv);
+      }
+  } else {
+    wrapperDiv = document.createElement('div');
+    wrapperDiv.id = 'mises-wrapper';
+    wrapperDiv.className = 'website-outer-container';
+    gscWrapper.prepend(wrapperDiv);
+  }
+  return wrapperDiv;
+}
 export const misesSearch = (raw_query:string) => {
   const elements = document.querySelectorAll('.gsc-expansionArea a.gs-title');
   const query = raw_query.trim();
@@ -162,19 +188,7 @@ export const misesSearch = (raw_query:string) => {
   }
 
   if (containsPornKeyword(query)) {
-    let gscWrapper = document.querySelector('.gsc-wrapper');
-    if(!gscWrapper){
-      return;
-    }
-    let wrapperDiv = document.getElementById('mises-wrapper');
-    if(wrapperDiv){
-        wrapperDiv.innerHTML = "";
-    } else {
-      wrapperDiv = document.createElement('div');
-      wrapperDiv.id = 'mises-wrapper';
-      wrapperDiv.className = 'website-outer-container';
-      gscWrapper.prepend(wrapperDiv);
-    }
+
     const ve : MisesSearchResult = {
       id: 've',
       title: 'Video Easy',
@@ -182,6 +196,10 @@ export const misesSearch = (raw_query:string) => {
       logo: 'https://app.videoeasy.site/favicon.png',
       desc: 'Free Porn,OnlyFans Leak, Ads free',
       color: 'black'
+    }
+    const wrapperDiv = getMisesWrapper();
+    if (!wrapperDiv) {
+      return;
     }
     fillMisesWrapper([ve], wrapperDiv);
     logEvent(analytics, 'mises_search', { 
@@ -202,28 +220,16 @@ export const misesSearch = (raw_query:string) => {
   fetch(`https://api.alb.mises.site/api/v1/website/internal_search?keywords=${query}`)
   .then((response) => response.json() as Promise<InternalSearchResult>)
   .then((ret) => {
-    let gscWrapper = document.querySelector('.gsc-wrapper');
-    if(!gscWrapper){
+    const wrapperDiv = getMisesWrapper();
+    if (!wrapperDiv) {
       return;
     }
-    let wrapperDiv = document.getElementById('mises-wrapper');
-    if(wrapperDiv){
-        wrapperDiv.innerHTML = "";
-    }
     if(ret && ret.data && ret.data.length > 0){
-      if (!wrapperDiv) {
-        wrapperDiv = document.createElement('div');
-        wrapperDiv.id = 'mises-wrapper';
-        wrapperDiv.className = 'website-outer-container';
-        gscWrapper.prepend(wrapperDiv);
-      }
       fillMisesWrapper(filterData(ret.data, elements), wrapperDiv);
       logEvent(analytics, 'mises_search', { step: "fill" });
     } else{
-      if(wrapperDiv){
-        wrapperDiv.style.display = "none";
-        wrapperDiv.className = "";
-      }
+      wrapperDiv.style.display = "none";
+      wrapperDiv.className = "";
       logEvent(analytics, 'mises_search', { step: "nofill" });
     }
   })

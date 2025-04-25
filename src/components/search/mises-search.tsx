@@ -71,7 +71,7 @@ const MisesSearchResultItem: React.FC<MisesSearchResultItemProps> = ({ item }) =
           </svg>
         </span>
       )}
-        {item.type === 'webstore' && (
+      {item.type === 'webstore' && (
         <span className="type">
           WebStore
         </span>
@@ -89,10 +89,11 @@ const filterData = (data: MisesSearchResult[], elements: NodeListOf<Element>) =>
 
 const chromeURLPattern = /^https?:\/\/chrome.google.com\/webstore\/.+?\/([a-z]{32})(?=[/#?]|$)/;
 const chromeNewURLPattern = /^https?:\/\/chromewebstore.google.com\/detail\/.+?\/([a-z]{32})(?=[/#?]|$)/;
+const microsoftURLPattern = /^https?:\/\/microsoftedge.microsoft.com\/addons\/detail\/.+?\/([a-z]{32})(?=[/#?]|$)/;
 function isAppleDevice(): boolean {
   return /iPhone|iPad|iPod|Macintosh/i.test(navigator.userAgent);
 }
-const fixForExtension = (item: MisesSearchResult) => {
+const fixForChromeExtension = (item: MisesSearchResult) => {
   if (item && item.url) {
     let result = chromeURLPattern.exec(item.url);
     if (!result) {
@@ -132,7 +133,7 @@ const fillMisesWrapper = (data: MisesSearchResult[], wrapperDiv: HTMLElement) =>
       {chunks.map((chunk: MisesSearchResult[], chunkIndex: number) => (
         <div key={chunkIndex} className="website-sub-container">
           {chunk.map((item: MisesSearchResult, index: number) => {
-            fixForExtension(item);
+            fixForChromeExtension(item);
             return <MisesSearchResultItem key={`${chunkIndex}-${index}`} item={item} />;
           })}
         </div>
@@ -255,7 +256,7 @@ export const maybeToggleMisesSearchResult = (resultElts: any) => {
         const container = document.createElement('div');
         result.appendChild(container);
         container.classList.add('crx-download');
-        var button = document.createElement('button');
+        const button = document.createElement('button');
         button.textContent = 'Download Extension CRX';
         button.onclick = function() {
             window.open( `https://clients2.google.com/service/update2/crx?response=redirect&prodversion=130.0.6723.93&acceptformat=crx2,crx3&x=id%3D${match[1]}%26uc&nacl_arch=arm64`, '_blank');
@@ -263,6 +264,18 @@ export const maybeToggleMisesSearchResult = (resultElts: any) => {
         container.appendChild(button);
       }
       
+      const match1 = microsoftURLPattern.exec(ogUrl);
+      if (match1 && match1[1]) {
+        const container = document.createElement('div');
+        result.appendChild(container);
+        container.classList.add('crx-download');
+        const button = document.createElement('button');
+        button.textContent = 'Download Extension CRX';
+        button.onclick = function() {
+            window.open( `https://edge.microsoft.com/extensionwebstorebase/v1/crx?response=redirect&prod=chromiumcrx&prodchannel=&x=id%3D${match1[1]}%26installsource%3Dondemand%26uc`, '_blank');
+        }
+        container.appendChild(button);
+      }
     }
     
   }

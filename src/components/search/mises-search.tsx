@@ -22,6 +22,83 @@ interface MisesSearchResultItemProps {
 }
 
 
+const MisesSearchResultItemAsSearchResult: React.FC<MisesSearchResultItemProps> = ({ item }) => {
+
+  const handleClick = () => {
+    logEvent(analytics, 'click_mises_result', {
+      content_type: 'videoeasy',
+      item_id: item.title
+    });
+  };
+
+  return (
+
+    <div className="gsc-webResult gsc-result">
+      <div className="gs-webResult gs-result">
+        <div className="gsc-thumbnail-inside">
+          <div className="gs-title">
+            <a
+              className="gs-title"
+              href={item.url}
+              target="_self"
+              dir="ltr"
+              onClick={handleClick}
+            >
+              {item.title}
+            </a>
+          </div>
+        </div>
+        <div className="gsc-url-top">
+          <div className="gs-bidi-start-align gs-visibleUrl gs-visibleUrl-short" dir="ltr">
+           {item.url}
+          </div>
+          <div
+            className="gs-bidi-start-align gs-visibleUrl gs-visibleUrl-long"
+            dir="ltr"
+            style={{ wordBreak: "break-all" }}
+          >
+            {item.url}
+          </div>
+          <div className="gs-bidi-start-align gs-visibleUrl gs-visibleUrl-breadcrumb">
+            <span>videoeasy.site</span><span> › search</span>
+          </div>
+        </div>
+        <div className="gsc-table-result">
+          <div className="gsc-table-cell-thumbnail gsc-thumbnail">
+            <div className="gs-image-box gs-web-image-box gs-web-image-box-landscape">
+              <a
+                className="gs-image"
+                href={item.url}
+                target="_self"
+                onClick={handleClick}
+              >
+                <img
+                  className="gs-image"
+                  src={item.logo}
+                  alt="Thumbnail image"
+                  style={(item.color && {
+                    background: item.color,
+                    objectFit: "cover",
+                    borderRadius: '10px',
+                  }) || {
+                    objectFit: "cover",
+                    borderRadius: '10px',
+                  }}
+                />
+              </a>
+            </div>
+          </div>
+          <div className="gsc-table-cell-snippet-close">
+            <div className="gs-bidi-start-align gs-snippet" dir="ltr" style={{ wordBreak: "break-all" }}>
+            {item.desc}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+);
+};
 
 const MisesSearchResultItem: React.FC<MisesSearchResultItemProps> = ({ item }) => {
   const handleClick = () => {
@@ -141,6 +218,25 @@ const fillMisesWrapper = (data: MisesSearchResult[], wrapperDiv: HTMLElement) =>
     </div>
   );
 }
+const fillMisesWrapperAsSearchResult = (data: MisesSearchResult[], wrapperDiv: HTMLElement) => {
+  console.log('fillMisesWrapperAsSearchResult')
+  if(!Array.isArray(data) || data.length === 0) {
+    return;
+  }
+  
+  let root = rootMap.get(wrapperDiv);
+  if (!root) {
+    root = createRoot(wrapperDiv);
+    rootMap.set(wrapperDiv, root);
+  }
+  root.render(
+    <div style={{ overflow: 'none' }}>
+          {data.map((item: MisesSearchResult, index: number) => {
+            return <MisesSearchResultItemAsSearchResult  key={`${index}`} item={item} />;
+          })}
+    </div>
+  );
+}
 
 const pornKeywords: string[] = [
   "xnxx",
@@ -189,25 +285,55 @@ export const misesSearch = (raw_query:string) => {
   }
 
   if (containsPornKeyword(query)) {
-
-    const ve : MisesSearchResult = {
-      id: 've',
-      title: 'Video Easy',
-      url: 'https://app.videoeasy.site/index.html#/popular?ctype=porn',
-      logo: 'https://app.videoeasy.site/favicon.png',
-      desc: 'Free Porn,OnlyFans Leak, Ads free',
-      color: 'black'
-    }
-    const wrapperDiv = getMisesWrapper();
-    if (!wrapperDiv) {
-      return;
-    }
-    fillMisesWrapper([ve], wrapperDiv);
-    logEvent(analytics, 'mises_search', { 
-      step: "porn",
+    logEvent(analytics, 'videoeasy_search', { 
+      step: "start",
       search_term: query
     });
-    
+
+    fetch(`https://api.videoeasy.site/api/v1/search/video_summary`, {
+      method: 'POST',
+      headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ query: query })
+    })
+    .then((response) => response.json() as Promise<any>)
+    .then((ret) => {
+      const wrapperDiv = getMisesWrapper();
+      if (!wrapperDiv) {
+        return;
+      }
+      if(ret && ret.data && ret.data  && ret.data.list && ret.data.list.length > 0){
+        const veItem = ret.data.list[0]
+        let logo = 'https://app.videoeasy.site/favicon.png'
+        if (veItem.media_list && veItem.media_list.length > 0) {
+          logo = veItem.media_list[0].img_url_thumb
+        }
+
+        const ve : MisesSearchResult = {
+          id: 've',
+          title: 'Video Easy | Magnet Search',
+          url: 'https://app.videoeasy.site/index.html#/search?sortBy=score&query=' + query +'&onlineWatch=0',
+          logo: logo,
+          desc: veItem.title,
+          color: 'black'
+        }
+        fillMisesWrapperAsSearchResult([ve], wrapperDiv);
+        logEvent(analytics, 'videoeasy_search', { step: "fill" });
+      } else{
+        wrapperDiv.style.display = "none";
+        wrapperDiv.className = "";
+        logEvent(analytics, 'videoeasy_search', { step: "nofill" });
+      }
+    })
+    .catch((error) => {
+      logEvent(analytics, 'videoeasy_search', { 
+        step: "error",
+        error: error.message 
+      });
+      console.log(error)
+    });
 
     return
   }

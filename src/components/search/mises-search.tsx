@@ -75,7 +75,7 @@ const MisesSearchResultItemAsSearchResult: React.FC<MisesSearchResultItemProps> 
                 <img
                   className="gs-image"
                   src={item.logo}
-                  alt="Thumbnail image"
+                  alt="Thumbnail"
                   style={(item.color && {
                     background: item.color,
                     objectFit: "cover",

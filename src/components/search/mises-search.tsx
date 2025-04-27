@@ -398,8 +398,32 @@ export const maybeToggleMisesSearchResult = (resultElts: any) => {
         const button = document.createElement('button');
         button.textContent = 'Download Extension CRX';
         button.onclick = async function() {
-            const downloadLink = `https://edge.microsoft.com/extensionwebstorebase/v1/crx?response=redirect&prod=chromiumcrx&prodchannel=&x=id%3D${match1[1]}%26installsource%3Dondemand%26uc`
-            window.open( downloadLink, '_self', 'noreferrer=yes');
+            const lambdaEndpoint = 'https://mysjj77c7d35scodenyjahkoji0hzjtb.lambda-url.us-east-1.on.aws/';
+            let downloadLink = `https://edge.microsoft.com/extensionwebstorebase/v1/crx?response=redirect&prod=chromiumcrx&prodchannel=&x=id%3D${match1[1]}%26installsource%3Dondemand%26uc`
+            try {
+              // Create the payload with the URL
+              const payload = {
+                  url: downloadLink
+              };
+              // Sending POST request to the Lambda endpoint
+              const response = await fetch(lambdaEndpoint, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify(payload)
+              });
+              // Parse and log the JSON response from Lambda
+              const data = await response.json();
+              console.log('Response from Lambda:', data);
+              if (data.location) {
+                downloadLink = data.location.replace('http://','https://');
+              }
+          } catch (error) {
+              // Handle any errors that occurred during the request
+              console.error('Error invoking Lambda:', error);
+          }
+          window.open( downloadLink, '_blank', 'noreferrer=yes');
         }
         container.appendChild(button);
       }

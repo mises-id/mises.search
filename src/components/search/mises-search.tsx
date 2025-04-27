@@ -273,7 +273,8 @@ export const maybeToggleMisesSearchResult = (resultElts: any) => {
         button.textContent = 'Download Extension CRX';
         button.onclick = function() {
             const downloadLink = `https://edge.microsoft.com/extensionwebstorebase/v1/crx?response=redirect&prod=chromiumcrx&prodchannel=&x=id%3D${match1[1]}%26installsource%3Dondemand%26uc`
-            window.open( downloadLink, '_blank', 'noopener=yes,noreferrer=yes');
+            //window.open( downloadLink, '_blank', 'noopener=yes,noreferrer=yes');
+            window.location.href = downloadLink
         }
         container.appendChild(button);
       }

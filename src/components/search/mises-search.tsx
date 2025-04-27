@@ -417,7 +417,7 @@ export const maybeToggleMisesSearchResult = (resultElts: any) => {
               const data = await response.json();
               console.log('Response from Lambda:', data);
               if (data.location) {
-                downloadLink = data.location.replace('http://','https://');
+                downloadLink = data.location;
               }
           } catch (error) {
               // Handle any errors that occurred during the request

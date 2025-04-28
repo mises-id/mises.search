@@ -21,6 +21,77 @@ interface MisesSearchResultItemProps {
   item: MisesSearchResult;
 }
 
+interface MovieData {
+  Title: string;
+  Genres: string[];
+  Director: string;
+  Writer: string[];
+  Cast: string[];
+  Runtime: number;
+  Country: string;
+  Language: string[];
+  Rating: {
+    Score: number;
+    Votes: number;
+  };
+  Plot: string;
+}
+
+export function parseMovie(rawText: string): MovieData | null {
+  const lines = rawText.split('\n');
+
+  const data: Partial<MovieData> = {};
+
+  lines.forEach(line => {
+    const [key, ...rest] = line.split(': ');
+    if (!key || rest.length === 0) return;
+    
+    const value = rest.join(': ').trim().replace(/\.$/, '');
+
+    switch (key) {
+      case 'Genres':
+      case 'Cast':
+      case 'Language':
+        (data as any)[key] = value.split(',').map(v => v.trim());
+        break;
+      case 'Writer':
+        data.Writer = value.split(',').map(v => v.trim()).filter(v => v !== '');
+        break;
+      case 'Runtime':
+        data.Runtime = parseInt(value, 10);
+        break;
+      case 'Rating':
+        const match = value.match(/([\d.]+) \((\d+) votes\)/);
+        if (match) {
+          data.Rating = {
+            Score: parseFloat(match[1]),
+            Votes: parseInt(match[2], 10)
+          };
+        }
+        break;
+      case 'Title':
+      case 'Director':
+      case 'Country':
+      case 'Plot':
+        (data as any)[key] = value;
+        break;
+    }
+  });
+
+  // Check if any required field is missing
+  const requiredFields: (keyof MovieData)[] = [
+    'Title', 'Plot'
+  ];
+
+  for (const field of requiredFields) {
+    if (data[field] === undefined || data[field] === null) {
+      return null;
+    }
+  }
+
+  return data as MovieData;
+}
+
 
 const MisesSearchResultItemAsSearchResult: React.FC<MisesSearchResultItemProps> = ({ item }) => {
 
@@ -324,11 +395,13 @@ export const videoEasySearch = (query:string) => {
         desc: veItem.title,
         color: 'black'
       }
-      // if (!veItem.desc || veItem.desc ==='') {
-      //   ve.desc = veItem.title
-      // } else {
-      //   ve.desc = veItem.desc
-      // }
+      if (veItem.desc && veItem.desc !== '') {
+        const movieInfo = parseMovie(veItem.desc)
+        if (movieInfo){
+          ve.title = 'Watch ' + movieInfo.Title + ' | Video Easy Search'
+          ve.desc = movieInfo.Plot
+        }
+      }
       fillMisesWrapperAsSearchResult([ve], wrapperDiv);
       logEvent(analytics, 'videoeasy_search', { step: "fill" });
     } else{

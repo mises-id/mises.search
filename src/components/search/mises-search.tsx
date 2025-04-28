@@ -359,6 +359,7 @@ function getMisesWrapper() {
   return wrapperDiv;
 }
 export const videoEasySearch = (query:string) => {
+  const allowPorn = containsKeyword(query, pornKeywords)
   logEvent(analytics, 'videoeasy_search', { 
     step: "start",
     search_term: query
@@ -385,6 +386,13 @@ export const videoEasySearch = (query:string) => {
         logo = veItem.cover_info.img_url_thumb
       } else if (veItem.media_list && veItem.media_list.length > 0) {
         logo = veItem.media_list[0].img_url_thumb
+      }
+
+      if (!allowPorn && veItem.ctype && veItem.ctype !== 'film_tv' && veItem.ctype !== 'anime') {
+        wrapperDiv.style.display = "none";
+        wrapperDiv.className = "";
+        logEvent(analytics, 'videoeasy_search', { step: "skip" });
+        return
       }
 
       const ve : MisesSearchResult = {

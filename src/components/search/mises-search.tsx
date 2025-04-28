@@ -310,13 +310,15 @@ export const videoEasySearch = (query:string) => {
     if(ret && ret.data && ret.data  && ret.data.list && ret.data.list.length > 0){
       const veItem = ret.data.list[0]
       let logo = 'https://app.videoeasy.site/favicon.png'
-      if (veItem.media_list && veItem.media_list.length > 0) {
+      if (veItem.cover_info && veItem.cover_info.img_url_thumb && veItem.cover_info.img_url_thumb !== '') {
+        logo = veItem.cover_info.img_url_thumb
+      } else if (veItem.media_list && veItem.media_list.length > 0) {
         logo = veItem.media_list[0].img_url_thumb
       }
 
       const ve : MisesSearchResult = {
         id: 've',
-        title: 'Video Easy | Magnet Search',
+        title: 'Watch | Video Easy Search',
         url: 'https://app.videoeasy.site/index.html#/search?sortBy=score&query=' + query +'&onlineWatch=0',
         logo: logo,
         desc: veItem.title,

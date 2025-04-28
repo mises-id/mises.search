@@ -319,8 +319,46 @@ const pornKeywords: string[] = [
   "xxx video",
   "porno",
   "xxx videos",
-  "sex videos"
+  "sex videos",
+  'censor',
+  "video",
+  "porn", "sex", "xxx", "anal", "blowjob", "cum", "gangbang", "milf", "teen", "hentai",
+  "bdsm", "fetish", "nude", "masturbation", "orgy", "threesome", "erotic", "naked", "shemale",
+  "tranny", "bondage", "vibrator", "escort", "webcam", "striptease", "lingerie", "sexcam", "pornstar",
+  "adult", "deepthroat", "handjob", "facials", "cumshot", "analplay", "rimjob", "pegging", "squirting",
+  "creampie", "doggystyle", "cowgirl", "missionary", "spooning", "fisting", "spanking", "roleplay",
+  "cuckold", "gloryhole", "bukkake", "rimming", "assplay", "titfuck", "footjob", "69", "facial", "dp",
+  "hardcore", "softcore", "voyeur", "nudist", "swinger", "lesbian", "gay", "bisexual", "transgender",
+  "incest", "bestiality", "strapon", "doublepenetration", "hardcore", "choking", "pussy", "cock",
+  "slut", "whore", "hooker", "brothel", "stripclub", "topless", "bottomless", "sexchat", "sexting",
+  "camgirl", "camboy", "livecam", "chatroulette", "omegle", "onlyfans", "fansly", "pornhub", "xvideos",
+  "xhamster", "redtube", "youporn", "brazzers", "bangbros", "naughtyamerica", "mofos", "realitykings",
+  "digitalplayground", "tits", "ass", "blowjobs", "bitches", "teens", "bigdick", "milfs", "kinky", "bimbo",
+  "femdom", "cumshot", "suck", "fuck", "bigboobs", "submissive", "dominatrix", "females", "males", "nipple",
+  "spitroast", "buttplug", "fucking", "panties", "nipples", "cumdump", "orgasm", "dildo", "vaginal", "tits",
+  "lesbian", "pussylicking", "facial", "blowjob", "manwhore", "cumshot", "cockfight", "sexworker", "adultstar",
+  "private", "toy", "masturbating", "oral", "fingering", "sexy", "lube", "publicsex", "fetish", "smut", "hookups",
+  "playboy", "horny", "groping", "pantie", "panty", "swallow", "goddess", "masturbation", "bigboobs", "naked",
+  "juicy", "orgasms", "milking", "twerk", "fetish", "vulgar", "fap", "slutty", "hot", "sextoys", "cum", "grind",
+  "wet", "prison", "brunette", "blonde", "chubby", "pussy", "cumming", "mature", "dirty", "teenager", "cock",
+  "fisting", "asshole", "gagging", "ejaculation", "sexual", "exhibitionism", "pornstar", "escort", "pervert",
+  "young", "black", "curvy", "milf", "spank", "hairy", "rape", "stripper", "dominant", "submissive", "cocktail",
+  "rape", "sexoffender", "seduction", "exhibitionist", "orgy", "twinks", "poppers", "swingers", "dominatrix",
+  "debauchery", "fetishism", "smut", "openrelationship", "cockring", "onahole", "gigolo", "cumswap", "hotwife",
+  "couple", "squirt", "cumplay", "gayporn", "groupsex", "fisting", "footfetish", "toys", "degradation",
+  "drunken", "perverted", "groupsex", "creampie", "bukkake", "mouth", "gagged", "swallow", "dom", "sub",
+  "humping", "exhibitionist", "hot", "cunnilingus", "penis", "toys", "threesome", "pleasure", "vibrator",
+  "consensual", "swinging", "tight", "boyfriend", "girlfriend", "anal", "lesbo", "interracial", "sapphic", "fetish",
+  "bondage", "possession", "gagging", "gobble", "blowjobs", "fetishes", "strapon", "insertion", "bellydancing"
 ];
+
+
+const avRegex = /[A-Za-z]{2,4}-?\d{3,4}/g;
+export function containsAVNumber(input: string): boolean {
+  const regex = new RegExp(avRegex); 
+  return regex.test(input);
+}
+
 
 const extensionKeywords: string[] = [
   "extension",
@@ -329,11 +367,18 @@ const extensionKeywords: string[] = [
   "defi",
 ];
 
-// 判断关键词是否包含敏感词
 export function containsKeyword(input: string, keywords: string[]): boolean {
   const normalized = input.toLowerCase();
   return keywords.some(keyword => normalized.includes(keyword));
 }
+
+export function containsPornKeyword(input: string): boolean {
+  const first = containsKeyword(input, pornKeywords);
+  const second = containsAVNumber(input);
+  console.log('containsPornKeyword', input, first, second)
+  return  first || second
+}
+
 
 
 function getMisesWrapper() {
@@ -359,7 +404,8 @@ function getMisesWrapper() {
   return wrapperDiv;
 }
 export const videoEasySearch = (query:string) => {
-  const allowPorn = containsKeyword(query, pornKeywords)
+  const allowPorn = containsPornKeyword(query)
+  console.log('videoEasySearch', allowPorn, query)
   logEvent(analytics, 'videoeasy_search', { 
     step: "start",
     search_term: query
@@ -435,7 +481,7 @@ export const misesSearch = (raw_query:string) => {
     return;
   }
 
-  if (containsKeyword(query, pornKeywords)) {
+  if (containsPornKeyword(query) && !containsKeyword(query, extensionKeywords)) {
     videoEasySearch(query);
     return
   }

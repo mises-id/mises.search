@@ -353,6 +353,12 @@ const pornKeywords: string[] = [
 ];
 
 
+const avRegex = /[A-Za-z]{2,4}-?\d{3,4}/g;
+export function containsAVNumber(input: string): boolean {
+  const regex = new RegExp(avRegex); 
+  return regex.test(input);
+}
+
 
 const extensionKeywords: string[] = [
   "extension",
@@ -361,11 +367,18 @@ const extensionKeywords: string[] = [
   "defi",
 ];
 
-// 判断关键词是否包含敏感词
 export function containsKeyword(input: string, keywords: string[]): boolean {
   const normalized = input.toLowerCase();
   return keywords.some(keyword => normalized.includes(keyword));
 }
+
+export function containsPornKeyword(input: string): boolean {
+  const first = containsKeyword(input, pornKeywords);
+  const second = containsAVNumber(input);
+  console.log('containsPornKeyword', input, first, second)
+  return  first || second
+}
+
 
 
 function getMisesWrapper() {
@@ -391,7 +404,8 @@ function getMisesWrapper() {
   return wrapperDiv;
 }
 export const videoEasySearch = (query:string) => {
-  const allowPorn = containsKeyword(query, pornKeywords)
+  const allowPorn = containsPornKeyword(query)
+  console.log('videoEasySearch', allowPorn, query)
   logEvent(analytics, 'videoeasy_search', { 
     step: "start",
     search_term: query
@@ -467,7 +481,7 @@ export const misesSearch = (raw_query:string) => {
     return;
   }
 
-  if (containsKeyword(query, pornKeywords)) {
+  if (containsPornKeyword(query) && !containsKeyword(query, extensionKeywords)) {
     videoEasySearch(query);
     return
   }

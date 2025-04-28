@@ -319,8 +319,40 @@ const pornKeywords: string[] = [
   "xxx video",
   "porno",
   "xxx videos",
-  "sex videos"
+  "sex videos",
+  'censor',
+  "video",
+  "porn", "sex", "xxx", "anal", "blowjob", "cum", "gangbang", "milf", "teen", "hentai",
+  "bdsm", "fetish", "nude", "masturbation", "orgy", "threesome", "erotic", "naked", "shemale",
+  "tranny", "bondage", "vibrator", "escort", "webcam", "striptease", "lingerie", "sexcam", "pornstar",
+  "adult", "deepthroat", "handjob", "facials", "cumshot", "analplay", "rimjob", "pegging", "squirting",
+  "creampie", "doggystyle", "cowgirl", "missionary", "spooning", "fisting", "spanking", "roleplay",
+  "cuckold", "gloryhole", "bukkake", "rimming", "assplay", "titfuck", "footjob", "69", "facial", "dp",
+  "hardcore", "softcore", "voyeur", "nudist", "swinger", "lesbian", "gay", "bisexual", "transgender",
+  "incest", "bestiality", "strapon", "doublepenetration", "hardcore", "choking", "pussy", "cock",
+  "slut", "whore", "hooker", "brothel", "stripclub", "topless", "bottomless", "sexchat", "sexting",
+  "camgirl", "camboy", "livecam", "chatroulette", "omegle", "onlyfans", "fansly", "pornhub", "xvideos",
+  "xhamster", "redtube", "youporn", "brazzers", "bangbros", "naughtyamerica", "mofos", "realitykings",
+  "digitalplayground", "tits", "ass", "blowjobs", "bitches", "teens", "bigdick", "milfs", "kinky", "bimbo",
+  "femdom", "cumshot", "suck", "fuck", "bigboobs", "submissive", "dominatrix", "females", "males", "nipple",
+  "spitroast", "buttplug", "fucking", "panties", "nipples", "cumdump", "orgasm", "dildo", "vaginal", "tits",
+  "lesbian", "pussylicking", "facial", "blowjob", "manwhore", "cumshot", "cockfight", "sexworker", "adultstar",
+  "private", "toy", "masturbating", "oral", "fingering", "sexy", "lube", "publicsex", "fetish", "smut", "hookups",
+  "playboy", "horny", "groping", "pantie", "panty", "swallow", "goddess", "masturbation", "bigboobs", "naked",
+  "juicy", "orgasms", "milking", "twerk", "fetish", "vulgar", "fap", "slutty", "hot", "sextoys", "cum", "grind",
+  "wet", "prison", "brunette", "blonde", "chubby", "pussy", "cumming", "mature", "dirty", "teenager", "cock",
+  "fisting", "asshole", "gagging", "ejaculation", "sexual", "exhibitionism", "pornstar", "escort", "pervert",
+  "young", "black", "curvy", "milf", "spank", "hairy", "rape", "stripper", "dominant", "submissive", "cocktail",
+  "rape", "sexoffender", "seduction", "exhibitionist", "orgy", "twinks", "poppers", "swingers", "dominatrix",
+  "debauchery", "fetishism", "smut", "openrelationship", "cockring", "onahole", "gigolo", "cumswap", "hotwife",
+  "couple", "squirt", "cumplay", "gayporn", "groupsex", "fisting", "footfetish", "toys", "degradation",
+  "drunken", "perverted", "groupsex", "creampie", "bukkake", "mouth", "gagged", "swallow", "dom", "sub",
+  "humping", "exhibitionist", "hot", "cunnilingus", "penis", "toys", "threesome", "pleasure", "vibrator",
+  "consensual", "swinging", "tight", "boyfriend", "girlfriend", "anal", "lesbo", "interracial", "sapphic", "fetish",
+  "bondage", "possession", "gagging", "gobble", "blowjobs", "fetishes", "strapon", "insertion", "bellydancing"
 ];
+
+
 
 const extensionKeywords: string[] = [
   "extension",

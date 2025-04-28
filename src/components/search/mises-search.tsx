@@ -251,11 +251,19 @@ const pornKeywords: string[] = [
   "sex videos"
 ];
 
+const extensionKeywords: string[] = [
+  "extension",
+  "wallet",
+  "web3",
+  "defi",
+];
+
 // 判断关键词是否包含敏感词
-export function containsPornKeyword(input: string): boolean {
+export function containsKeyword(input: string, keywords: string[]): boolean {
   const normalized = input.toLowerCase();
-  return pornKeywords.some(keyword => normalized.includes(keyword));
+  return keywords.some(keyword => normalized.includes(keyword));
 }
+
 
 function getMisesWrapper() {
   let gscWrapper = document.querySelector('.gsc-wrapper');
@@ -264,11 +272,13 @@ function getMisesWrapper() {
   }
   let wrapperDiv = document.getElementById('mises-wrapper');
   if(wrapperDiv){
-      const root = rootMap.get(wrapperDiv);
-      if(root) {
-          root.unmount();
-          rootMap.delete(wrapperDiv);
-      }
+    const root = rootMap.get(wrapperDiv);
+    if(root) {
+        root.unmount();
+        rootMap.delete(wrapperDiv);
+    }
+    wrapperDiv.style.display = "block";
+    wrapperDiv.className = "website-outer-container";
   } else {
     wrapperDiv = document.createElement('div');
     wrapperDiv.id = 'mises-wrapper';
@@ -277,6 +287,64 @@ function getMisesWrapper() {
   }
   return wrapperDiv;
 }
+export const videoEasySearch = (query:string) => {
+  logEvent(analytics, 'videoeasy_search', { 
+    step: "start",
+    search_term: query
+  });
+
+  fetch(`https://api.videoeasy.site/api/v1/search/video_summary`, {
+    method: 'POST',
+    headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ query: query })
+  })
+  .then((response) => response.json() as Promise<any>)
+  .then((ret) => {
+    const wrapperDiv = getMisesWrapper();
+    if (!wrapperDiv) {
+      return;
+    }
+    if(ret && ret.data && ret.data  && ret.data.list && ret.data.list.length > 0){
+      const veItem = ret.data.list[0]
+      let logo = 'https://app.videoeasy.site/favicon.png'
+      if (veItem.media_list && veItem.media_list.length > 0) {
+        logo = veItem.media_list[0].img_url_thumb
+      }
+
+      const ve : MisesSearchResult = {
+        id: 've',
+        title: 'Video Easy | Magnet Search',
+        url: 'https://app.videoeasy.site/index.html#/search?sortBy=score&query=' + query +'&onlineWatch=0',
+        logo: logo,
+        desc: veItem.title,
+        color: 'black'
+      }
+      // if (!veItem.desc || veItem.desc ==='') {
+      //   ve.desc = veItem.title
+      // } else {
+      //   ve.desc = veItem.desc
+      // }
+      fillMisesWrapperAsSearchResult([ve], wrapperDiv);
+      logEvent(analytics, 'videoeasy_search', { step: "fill" });
+    } else{
+      wrapperDiv.style.display = "none";
+      wrapperDiv.className = "";
+      logEvent(analytics, 'videoeasy_search', { step: "nofill" });
+    }
+  })
+  .catch((error) => {
+    logEvent(analytics, 'videoeasy_search', { 
+      step: "error",
+      error: error.message 
+    });
+    console.log(error)
+  });
+
+  return
+}
 export const misesSearch = (raw_query:string) => {
   const elements = document.querySelectorAll('.gsc-expansionArea a.gs-title');
   const query = raw_query.trim();
@@ -284,57 +352,8 @@ export const misesSearch = (raw_query:string) => {
     return;
   }
 
-  if (containsPornKeyword(query)) {
-    logEvent(analytics, 'videoeasy_search', { 
-      step: "start",
-      search_term: query
-    });
-
-    fetch(`https://api.videoeasy.site/api/v1/search/video_summary`, {
-      method: 'POST',
-      headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ query: query })
-    })
-    .then((response) => response.json() as Promise<any>)
-    .then((ret) => {
-      const wrapperDiv = getMisesWrapper();
-      if (!wrapperDiv) {
-        return;
-      }
-      if(ret && ret.data && ret.data  && ret.data.list && ret.data.list.length > 0){
-        const veItem = ret.data.list[0]
-        let logo = 'https://app.videoeasy.site/favicon.png'
-        if (veItem.media_list && veItem.media_list.length > 0) {
-          logo = veItem.media_list[0].img_url_thumb
-        }
-
-        const ve : MisesSearchResult = {
-          id: 've',
-          title: 'Video Easy | Magnet Search',
-          url: 'https://app.videoeasy.site/index.html#/search?sortBy=score&query=' + query +'&onlineWatch=0',
-          logo: logo,
-          desc: veItem.title,
-          color: 'black'
-        }
-        fillMisesWrapperAsSearchResult([ve], wrapperDiv);
-        logEvent(analytics, 'videoeasy_search', { step: "fill" });
-      } else{
-        wrapperDiv.style.display = "none";
-        wrapperDiv.className = "";
-        logEvent(analytics, 'videoeasy_search', { step: "nofill" });
-      }
-    })
-    .catch((error) => {
-      logEvent(analytics, 'videoeasy_search', { 
-        step: "error",
-        error: error.message 
-      });
-      console.log(error)
-    });
-
+  if (containsKeyword(query, pornKeywords)) {
+    videoEasySearch(query);
     return
   }
   logEvent(analytics, 'mises_search', { 
@@ -358,6 +377,9 @@ export const misesSearch = (raw_query:string) => {
       wrapperDiv.style.display = "none";
       wrapperDiv.className = "";
       logEvent(analytics, 'mises_search', { step: "nofill" });
+      if (!containsKeyword(query, extensionKeywords)) {
+        videoEasySearch(query);
+      }
     }
   })
   .catch((error) => {

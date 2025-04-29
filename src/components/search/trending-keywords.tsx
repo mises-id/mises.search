@@ -14,6 +14,19 @@ const TrendingKeywords: React.FC<TrendingKeywordsProps> = ({ onKeywordClick }) =
     const CACHE_KEY = 'trending_keywords_cache';
     const CACHE_EXPIRY = 60 * 60 * 1000; // 1 hour
 
+    const shuffleArray = (arr: string[]) => {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+    const setTrendingKeywordsShuffled = async (keywords: string[]) => {
+      const shuffled = shuffleArray(keywords);
+      setTrendingKeywords(shuffled.slice(0, 6))
+    }
+
     const fetchTrendingKeywords = async () => {
       try {
         const cached = localStorage.getItem(CACHE_KEY);
@@ -23,7 +36,7 @@ const TrendingKeywords: React.FC<TrendingKeywordsProps> = ({ onKeywordClick }) =
           cachedData = JSON.parse(cached);
           // Check if cache is expired
           if (Date.now() - cachedData.timestamp < CACHE_EXPIRY) {
-            setTrendingKeywords(cachedData.keywords);
+            setTrendingKeywordsShuffled(cachedData.keywords);
             setLoading(false);
             return;
           }
@@ -35,7 +48,7 @@ const TrendingKeywords: React.FC<TrendingKeywordsProps> = ({ onKeywordClick }) =
         }
 
         try {
-          const response = await fetch('https://web3.mises.site/website/config.json', {
+          const response = await fetch('https://web3.mises.site/website/config-search.json', {
             headers,
           });
           
@@ -43,12 +56,12 @@ const TrendingKeywords: React.FC<TrendingKeywordsProps> = ({ onKeywordClick }) =
             // Data hasn't changed - refresh cache timestamp
             cachedData.timestamp = Date.now();
             localStorage.setItem(CACHE_KEY, JSON.stringify(cachedData));
-            setTrendingKeywords(cachedData.keywords);
+            setTrendingKeywordsShuffled(cachedData.keywords);
           } else if (response.ok) {
             const config = await response.json();
             let keywords:string[] = [];
-            if (config.recommended_extensions) {
-              config.recommended_extensions.forEach((item: any) => {
+            if (config.recommended_sites) {
+              config.recommended_sites.forEach((item: any) => {
                 if (typeof item.title === 'string') {
                   keywords.push(item.title.toLowerCase())
                 }
@@ -62,14 +75,14 @@ const TrendingKeywords: React.FC<TrendingKeywordsProps> = ({ onKeywordClick }) =
               lastModified,
               timestamp: Date.now()
             }));
-            setTrendingKeywords(keywords);
+            setTrendingKeywordsShuffled(keywords);
           } else {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
         } catch (fetchErr) {
           // If fetch fails but we have cached data, use that
           if (cachedData) {
-            setTrendingKeywords(cachedData.keywords);
+            setTrendingKeywordsShuffled(cachedData.keywords);
           } else {
             throw fetchErr;
           }

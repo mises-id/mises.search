@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { analytics } from '../../utils/firebase';
+import { isAppleDevice } from '../../utils';
 import { logEvent } from 'firebase/analytics';
 
 interface MisesSearchResult {
@@ -238,9 +239,7 @@ const filterData = (data: MisesSearchResult[], elements: NodeListOf<Element>) =>
 const chromeURLPattern = /^https?:\/\/chrome.google.com\/webstore\/.+?\/([a-z]{32})(?=[/#?]|$)/;
 const chromeNewURLPattern = /^https?:\/\/chromewebstore.google.com\/detail\/.+?\/([a-z]{32})(?=[/#?]|$)/;
 const microsoftURLPattern = /^https?:\/\/microsoftedge.microsoft.com\/addons\/detail\/.+?\/([a-z]{32})(?=[/#?]|$)/;
-function isAppleDevice(): boolean {
-  return /iPhone|iPad|iPod|Macintosh/i.test(navigator.userAgent);
-}
+
 const fixForChromeExtension = (item: MisesSearchResult) => {
   if (item && item.url) {
     let result = chromeURLPattern.exec(item.url);

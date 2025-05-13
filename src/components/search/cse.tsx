@@ -100,7 +100,9 @@ const GoogleCustomSearch: React.FC<Props> = ({ cx }) => {
         data-autocompletemaxcompletions="5"
         data-autocompletemaxpromotions="5"
         data-websearchsafesearch="off"
+        data-safesearch="off"
         data-enableorderby="true"
+        data-filter="0"
       ></div>
     </div>
   );

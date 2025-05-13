@@ -8,9 +8,17 @@
 // import Loading from "@/components/pageLoading";
 import GoogleCustomSearch from '@/components/search/cse';
 import "./index.less";
+import { isAppleDevice } from '../../utils';
 const Home = () => {
 
-  const cx = '26f94955e327b21df';
+  const getCx = () => {
+    if (isAppleDevice()) {
+      return '774f9d97710df32e4'
+    } else {
+      return '26f94955e327b21df'
+    }
+
+  }
 
 
 
@@ -25,7 +33,7 @@ const Home = () => {
           <div><span className="beta-tag">BETA</span></div>
         </div>
       </div>
-      <GoogleCustomSearch cx={cx}/>
+      <GoogleCustomSearch cx={getCx()}/>
       
       </div>
 

@@ -45,3 +45,8 @@ export function isMisesBrowser() {
 }
 export const web3sitesCacheKey = 'web3siteCategoryCache'
 export const extensionCacheKey = 'extensionCategoryCache'
+
+
+export function isAppleDevice(): boolean {
+  return /iPhone|iPad|iPod|Macintosh/i.test(navigator.userAgent);
+}

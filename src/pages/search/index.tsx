@@ -8,15 +8,15 @@
 // import Loading from "@/components/pageLoading";
 import GoogleCustomSearch from '@/components/search/cse';
 import "./index.less";
-import { isAppleDevice } from '../../utils';
+//import { isAppleDevice } from '../../utils';
 const Home = () => {
 
   const getCx = () => {
-    if (isAppleDevice()) {
+    //if (isAppleDevice()) {
       return '774f9d97710df32e4'
-    } else {
-      return '26f94955e327b21df'
-    }
+    // } else {
+    //   return '26f94955e327b21df'
+    // }
 
   }
 

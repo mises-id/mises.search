@@ -108,6 +108,10 @@ const TrendingKeywords: React.FC<TrendingKeywordsProps> = ({ onKeywordClick }) =
     </div>
   );
   if (error) return <div className="trending-keywords">{error}</div>;
+
+  const truncate = (str: string, maxLength: number) => {
+    return str.length > maxLength ? str.slice(0, maxLength) + '...' : str;
+  };
   return (
     <div className="trending-keywords">
       <div className="keywords-container">
@@ -117,7 +121,7 @@ const TrendingKeywords: React.FC<TrendingKeywordsProps> = ({ onKeywordClick }) =
             className="keyword-tag"
             onClick={() => onKeywordClick(keyword)}
           >
-            {keyword}
+            {truncate(keyword, 20)}
           </button>
         ))}
       </div>

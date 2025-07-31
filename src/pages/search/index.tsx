@@ -13,9 +13,9 @@ const Home = () => {
 
   const getCx = () => {
     //if (isAppleDevice()) {
-      return '774f9d97710df32e4'
+    //return '774f9d97710df32e4'
     // } else {
-    //   return '26f94955e327b21df'
+    return '26f94955e327b21df'
     // }
 
   }
